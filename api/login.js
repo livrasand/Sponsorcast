@@ -6,7 +6,7 @@ export default function handler(req, res) {
   // Incluir el github-user en el state para pasarlo al callback
   const state = Buffer.from(JSON.stringify({ githubUser })).toString('base64');
   
-  const url = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=read:user read:org&state=${encodeURIComponent(state)}`;
+  const url = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=read:user read:org read:sponsorships&state=${encodeURIComponent(state)}`;
 
   res.writeHead(302, { Location: url });
   res.end();
