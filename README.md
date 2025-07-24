@@ -1,8 +1,7 @@
 # Sponsorcast
 
-> **GitHub Sponsors Exclusive Video Platform** - Monetize your content by making videos exclusive to your GitHub Sponsors.
+> **Embeddable screencasts for GitHub Sponsors** - Monetize your content by making videos exclusive to your GitHub Sponsors.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/livrasand/Sponsorcast)
 
 ## Features
 
