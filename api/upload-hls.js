@@ -15,8 +15,15 @@ export default async function handler(req, res) {
   }
 
   try {
+    const uploadRoot = './v'; 
+
+    // Verifica si la carpeta raíz existe, si no la crea
+    if (!fs.existsSync(uploadRoot)) {
+      fs.mkdirSync(uploadRoot, { recursive: true });
+    }
+
     const form = formidable({
-      uploadDir: './videos',
+      uploadDir: uploadRoot,
       keepExtensions: true,
       multiples: true,
       maxFileSize: 500 * 1024 * 1024, // 500MB
@@ -27,7 +34,7 @@ export default async function handler(req, res) {
     const githubUser = fields.githubUser?.[0] || process.env.GITHUB_USER;
 
     // Crear directorio para el video
-    const videoDir = path.join('./videos', videoId);
+    const videoDir = path.join(uploadRoot, videoId);
     if (!fs.existsSync(videoDir)) {
       fs.mkdirSync(videoDir, { recursive: true });
     }
