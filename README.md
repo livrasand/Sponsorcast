@@ -21,7 +21,7 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <!-- Include Sponsorcast web component -->
-<script src="https://your-domain.com/sponsorcast.js"></script>
+<script src="https://sponsorcast.vercel.app/sponsorcast.js"></script>
 
 <!-- Embed protected video -->
 <sponsor-cast 
