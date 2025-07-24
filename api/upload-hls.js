@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const uploadRoot = './v'; 
+    const uploadRoot = path.join(process.cwd(), 'v');
 
     // Verifica si la carpeta raíz existe, si no la crea
     if (!fs.existsSync(uploadRoot)) {
