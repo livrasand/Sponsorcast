@@ -1,6 +1,7 @@
 import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { createId } from '@paralleldrive/cuid2';
 
 export const config = {
@@ -15,7 +16,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const uploadRoot = path.join(process.cwd(), 'v');
+    // En Vercel, usar directorio temporal en lugar de process.cwd()
+    const uploadRoot = path.join(os.tmpdir(), 'sponsorcast-uploads');
 
     // Verifica si la carpeta raíz existe, si no la crea
     if (!fs.existsSync(uploadRoot)) {
