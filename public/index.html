@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsorcast - Screencasts for GitHub Sponsors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #fafafa;
+            color: #171717;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            padding: 40px 0 80px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 80px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #171717;
+            margin-bottom: 16px;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #737373;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 120px;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #000 0%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 24px;
+            color: #525252;
+            max-width: 800px;
+            margin: 0 auto 48px;
+            font-weight: 400;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #171717;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .cta-button:hover {
+            background: #262626;
+            transform: translateY(-1px);
+        }
+
+        /* Features Grid */
+        .features {
+            margin-bottom: 120px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            letter-spacing: -0.025em;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: #737373;
+            text-align: center;
+            margin-bottom: 64px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #d1d5db;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            color: #525252;
+            font-size: 16px;
+        }
+
+        /* Code Section */
+        .code-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 48px;
+            margin-bottom: 120px;
+        }
+
+        .code-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 24px 0;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        .code-tag {
+            color: #569cd6;
+        }
+
+        .code-attr {
+            color: #9cdcfe;
+        }
+
+        .code-string {
+            color: #ce9178;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 48px;
+            margin-bottom: 120px;
+        }
+
+        .demo-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .demo-note {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .demo-video {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Setup Section */
+        .setup-section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 48px;
+            margin-bottom: 80px;
+        }
+
+        .setup-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .setup-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .setup-step {
+            counter-increment: step-counter;
+            margin-bottom: 24px;
+            padding-left: 48px;
+            position: relative;
+        }
+
+        .setup-step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #171717;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: #525252;
+            margin-bottom: 16px;
+        }
+
+        /* Attributes Table */
+        .attributes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .attributes-table th,
+        .attributes-table td {
+            text-align: left;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .attributes-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .attributes-table td {
+            font-size: 14px;
+        }
+
+        .attributes-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .attr-name {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .attr-required {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .attr-optional {
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid #e5e7eb;
+            color: #737373;
+        }
+
+        .success-banner {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+        }
+
+        .success-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .success-features {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin: 12px 0 0 0;
+        }
+
+        .success-features li {
+            font-size: 14px;
+        }
+
+        .success-features li::before {
+            content: "✓ ";
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 40px;
+            }
+            
+            .hero-description {
+                font-size: 20px;
+            }
+            
+            .code-section,
+            .demo-section,
+            .setup-section {
+                padding: 32px 24px;
+            }
+            
+            .container {
+                padding: 0 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">Sponsorcast</div>
+            <p class="subtitle">GitHub Sponsors Exclusive Video Platform</p>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title">Monetize Your Content</h1>
+            <p class="hero-description">
+                Create exclusive video content for your GitHub Sponsors with professional HLS streaming and automatic access control.
+            </p>
+            <a href="#demo" class="cta-button">
+                <span>See Demo</span>
+                <span>↓</span>
+            </a>
+        </section>
+
+        <!-- Features -->
+        <section class="features">
+            <h2 class="section-title">Why Sponsorcast?</h2>
+            <p class="section-subtitle">Everything you need to create sponsor-exclusive video content</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">Sponsor Protection</h3>
+                    <p class="feature-description">
+                        Automatic verification via GitHub's GraphQL API. Only your sponsors can access protected content.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎥</div>
+                    <h3 class="feature-title">Professional Streaming</h3>
+                    <p class="feature-description">
+                        HLS video streaming with adaptive bitrate for optimal viewing experience across all devices.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Simple Integration</h3>
+                    <p class="feature-description">
+                        Single web component. Just include the script and embed your videos with one HTML tag.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Fully Responsive</h3>
+                    <p class="feature-description">
+                        Works perfectly on desktop, tablet, and mobile. Your content looks great everywhere.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Start -->
+        <section class="code-section">
+            <h2 class="code-title">Quick Start</h2>
+            <p>Embed protected videos in just three lines of code:</p>
+            
+            <div class="code-block">
+<span class="code-comment">&lt;!-- Include required scripts --&gt;</span>
+<span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-string">"https://cdn.jsdelivr.net/npm/hls.js@latest"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
+<span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-string">"https://your-domain.com/sponsorcast.js"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
+
+<span class="code-comment">&lt;!-- Embed protected video --&gt;</span>
+<span class="code-tag">&lt;sponsor-cast</span> 
+    <span class="code-attr">src</span>=<span class="code-string">"your-video-id"</span>
+    <span class="code-attr">github-user</span>=<span class="code-string">"your-github-username"</span>
+    <span class="code-attr">width</span>=<span class="code-string">"720"</span>
+    <span class="code-attr">autoplay</span><span class="code-tag">&gt;</span>
+<span class="code-tag">&lt;/sponsor-cast&gt;</span>
+            </div>
+
+            <h3 style="margin-top: 32px; margin-bottom: 16px; font-size: 18px; font-weight: 600;">Component Attributes</h3>
+            
+            <table class="attributes-table">
+                <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="attr-name">src</span> <span class="attr-required">required</span></td>
+                        <td>string</td>
+                        <td>Video ID or folder name containing HLS segments</td>
+                    </tr>
+                    <tr>
+                        <td><span class="attr-name">github-user</span> <span class="attr-required">required</span></td>
+                        <td>string</td>
+                        <td>GitHub username to check sponsorship for</td>
+                    </tr>
+                    <tr>
+                        <td><span class="attr-name">width</span> <span class="attr-optional">optional</span></td>
+                        <td>string</td>
+                        <td>Video width (default: 720px)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="attr-name">height</span> <span class="attr-optional">optional</span></td>
+                        <td>string</td>
+                        <td>Video height (default: auto)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="attr-name">autoplay</span> <span class="attr-optional">optional</span></td>
+                        <td>boolean</td>
+                        <td>Enable autoplay (muted by default)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Demo -->
+        <section id="demo" class="demo-section">
+            <h2 class="demo-title">Live Demo</h2>
+            <div class="demo-note">
+                <strong>Note:</strong> This demo requires GitHub Sponsorship of <strong>@livrasand</strong>. 
+                Non-sponsors will see the sponsorship prompt.
+            </div>
+            
+            <div class="demo-video">
+                <sponsor-cast 
+                    src="local-test"
+                    github-user="livrasand"
+                    width="100%">
+                </sponsor-cast>
+            </div>
+        </section>
+
+        <!-- Setup -->
+        <section class="setup-section">
+            <h2 class="setup-title">Setup Instructions</h2>
+            
+            <ol class="setup-steps">
+                <li class="setup-step">
+                    <div class="step-title">Deploy to Vercel</div>
+                    <div class="step-description">Fork the repository and deploy to Vercel with one click</div>
+                </li>
+                
+                <li class="setup-step">
+                    <div class="step-title">Create GitHub OAuth App</div>
+                    <div class="step-description">Set up a new OAuth application in your GitHub developer settings</div>
+                </li>
+                
+                <li class="setup-step">
+                    <div class="step-title">Configure Environment Variables</div>
+                    <div class="step-description">Add the following variables to your Vercel deployment:</div>
+                    <div class="code-block" style="margin-top: 12px;">
+GITHUB_CLIENT_ID=your_oauth_app_id
+GITHUB_CLIENT_SECRET=your_oauth_app_secret  
+GITHUB_USER=your_username
+JWT_SECRET=random_secret_string
+HOST=https://your-domain.com</div>
+                </li>
+                
+                <li class="setup-step">
+                    <div class="step-title">Upload Videos</div>
+                    <div class="step-description">Use sponsorcast-cli or manually upload HLS files to the videos folder</div>
+                </li>
+            </ol>
+
+            <div class="success-banner">
+                <div class="success-title">Production Ready</div>
+                <p>Your Sponsorcast instance includes:</p>
+                <ul class="success-features">
+                    <li>Dynamic github-user parameters</li>
+                    <li>Secure JWT authentication</li>
+                    <li>HLS video streaming</li>
+                    <li>Responsive design</li>
+                    <li>Error handling</li>
+                    <li>CLI integration ready</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Built for creators who value their community</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="/sponsorcast.js"></script>
+</body>
+</html>

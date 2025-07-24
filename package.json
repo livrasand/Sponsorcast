@@ -1,0 +1,42 @@
+{
+  "name": "sponsorcast",
+  "version": "1.0.0",
+  "description": "GitHub Sponsors Exclusive Video Platform - Monetize your content by making videos exclusive to your GitHub Sponsors",
+  "main": "public/sponsorcast.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required for Vercel deployment'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "github",
+    "sponsors",
+    "video",
+    "streaming",
+    "hls",
+    "monetization",
+    "web-component"
+  ],
+  "author": "Livrädo Sandoval <livrasand@outlook.com>",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/livrasand/sponsorcast"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.11.0",
+    "formidable": "^3.5.4",
+    "jsonwebtoken": "^9.0.2",
+    "@paralleldrive/cuid2": "^2.2.2"
+  },
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  }
+}
