@@ -46,9 +46,10 @@ export default async function handler(req, res) {
       throw new Error(`Creator ${githubUser} not found or no PAT configured`);
     }
 
-    // 4. Verificar si el visitante es sponsor del creador
-    const valid = await isSponsorOfCreator(creatorPAT, visitorInfo.login);
-
+    // 4. Verificar si el visitante es sponsor del creador O ES EL PROPIETARIO
+    const isOwner = visitorInfo.login === githubUser;
+    const valid = isOwner || await isSponsorOfCreator(creatorPAT, visitorInfo.login);
+    
     if (!valid) {
       return res.status(403).send(`
         <html>
