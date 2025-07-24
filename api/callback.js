@@ -1,8 +1,7 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { getUserInfo } from '../lib/github.js';
+import { getUserInfo, isSponsorOfCreator } from '../lib/github.js';
 import { getCreatorPAT } from '../lib/database.js';
-import { isSponsorOfCreator } from '../lib/github.js';
 
 export default async function handler(req, res) {
   const code = req.query.code;

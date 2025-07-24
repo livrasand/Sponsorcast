@@ -22,7 +22,7 @@
   ],
   "author": "Livrädo Sandoval <livrasand@outlook.com>",
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/livrasand/sponsorcast"
