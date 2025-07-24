@@ -31,10 +31,12 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@vercel/kv": "^3.0.0",
     "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
     "formidable": "^3.5.4",
-    "jsonwebtoken": "^9.0.2",
-    "@paralleldrive/cuid2": "^2.2.2"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@vercel/node": "^3.0.0"

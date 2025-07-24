@@ -1,6 +1,8 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import { isSponsor } from '../lib/github.js';
+import { getUserInfo } from '../lib/github.js';
+import { getCreatorPAT } from '../lib/database.js';
+import { isSponsorOfCreator } from '../lib/github.js';
 
 export default async function handler(req, res) {
   const code = req.query.code;
@@ -33,8 +35,20 @@ export default async function handler(req, res) {
       throw new Error('No access token received');
     }
 
-    // 2. Verificar si es sponsor del usuario específico
-    const valid = await isSponsor(access_token, githubUser);
+    // 2. Obtener información del visitante
+    const visitorInfo = await getUserInfo(access_token);
+    if (!visitorInfo) {
+      throw new Error('Could not get visitor information');
+    }
+
+    // 3. Obtener PAT del creador
+    const creatorPAT = await getCreatorPAT(githubUser);
+    if (!creatorPAT) {
+      throw new Error(`Creator ${githubUser} not found or no PAT configured`);
+    }
+
+    // 4. Verificar si el visitante es sponsor del creador
+    const valid = await isSponsorOfCreator(creatorPAT, visitorInfo.login);
 
     if (!valid) {
       return res.status(403).send(`
@@ -49,7 +63,7 @@ export default async function handler(req, res) {
       `);
     }
 
-    // 3. Firmar JWT con información del usuario (válido por 1 hora)
+    // 5. Firmar JWT con información del usuario (válido por 1 hora)
     const token = jwt.sign(
       { 
         sponsor: true, 
@@ -60,7 +74,7 @@ export default async function handler(req, res) {
       { expiresIn: '1h' }
     );
 
-    // 4. Establecer cookie y redirigir
+    // 6. Establecer cookie y redirigir
     res.setHeader('Set-Cookie', `sponsor_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`);
     
     res.send(`
