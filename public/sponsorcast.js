@@ -371,7 +371,7 @@ class SponsorCast extends HTMLElement {
       video.muted = true; // Required for autoplay in most browsers
     }
 
-    const playlistURL = `https://${process.env.R2_PUBLIC_URL}.r2.dev/${src}/playlist.m3u8`;
+    const playlistURL = `https://pub-2936dd6a3cb4488da476731228bbb559.r2.dev/${src}/playlist.m3u8`;
     
     // Verificar si HLS.js está cargado
     if (typeof Hls !== 'undefined' && Hls.isSupported()) {
