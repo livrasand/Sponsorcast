@@ -1,9 +1,10 @@
+// api/upload-hls.js
 import formidable from 'formidable';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { createId } from '@paralleldrive/cuid2';
-import { uploadToR2 } from '@/lib/r2-client';
+import { uploadToR2 } from '../lib/r2-client.js';
 
 export const config = {
   api: {
@@ -63,7 +64,7 @@ export default async function handler(req, res) {
           url: publicUrl
         });
 
-        fs.unlinkSync(file.filepath); // eliminar archivo temporal
+        fs.unlinkSync(file.filepath);
       }
     }
 
@@ -91,7 +92,8 @@ export default async function handler(req, res) {
       message: `Successfully uploaded ${uploadedFiles.length} files`,
       files: uploadedFiles.map(f => ({ name: f.filename, size: f.size })),
       playUrl: `${req.headers.origin || process.env.HOST}/api/playlist/${videoId}`,
-      embedCode: `<sponsor-cast src="${videoId}" github-user="${githubUser}"></sponsor-cast>`
+      embedCode: `<sponsor-cast src="${videoId}" github-user="${githubUser}"></sponsor-cast>`,
+      totalSize: metadata.totalSize
     });
 
   } catch (error) {
