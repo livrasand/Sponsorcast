@@ -28,7 +28,7 @@
 
         /* Header */
         .header {
-            padding: 40px 0 80px;
+            padding: 40px 0 40px;
             text-align: center;
             border-bottom: 1px solid #e5e7eb;
             margin-bottom: 80px;
@@ -405,21 +405,63 @@
                 padding: 0 16px;
             }
         }
+
+        .button-outline,
+.button-solid {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+
+.button-outline {
+    color: #171717;
+    border: 1px solid #d4d4d8;
+    background: transparent;
+}
+
+.button-outline:hover {
+    background: #f4f4f5;
+    border-color: #a1a1aa;
+}
+
+.button-solid {
+    background: #171717;
+    color: white;
+    border: 1px solid #171717;
+}
+
+.button-solid:hover {
+    background: #262626;
+    border-color: #262626;
+}
+
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
-        <header class="header">
-            <div class="logo">Sponsorcast</div>
-            <p class="subtitle">GitHub Sponsors Exclusive Video Platform</p>
-        </header>
+<header class="header">
+    <div class="container">
+        <div class="header-top" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div class="logo" style="font-size: 28px;">Sponsorcast</div>
+            <div class="header-actions" style="display: flex; gap: 12px;">
+                <a href="/login.html" class="button-outline">Iniciar sesión</a>
+                <a href="/signup.html" class="button-solid">Crear cuenta</a>
+            </div>
+        </div>
+    </div>
+</header>
+
 
         <!-- Hero Section -->
         <section class="hero">
             <h1 class="hero-title">Monetize Your Content</h1>
             <p class="hero-description">
-                Create exclusive video content for your GitHub Sponsors with professional HLS streaming and automatic access control.
+                Create exclusive video content for your GitHub Sponsors with professional streaming and automatic access control.
             </p>
             <a href="#demo" class="cta-button">
                 <span>See Demo</span>
@@ -428,44 +470,61 @@
         </section>
 
         <!-- Features -->
-        <section class="features">
-            <h2 class="section-title">Why Sponsorcast?</h2>
-            <p class="section-subtitle">Everything you need to create sponsor-exclusive video content</p>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3 class="feature-title">Sponsor Protection</h3>
-                    <p class="feature-description">
-                        Automatic verification via GitHub's GraphQL API. Only your sponsors can access protected content.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🎥</div>
-                    <h3 class="feature-title">Professional Streaming</h3>
-                    <p class="feature-description">
-                        HLS video streaming with adaptive bitrate for optimal viewing experience across all devices.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3 class="feature-title">Simple Integration</h3>
-                    <p class="feature-description">
-                        Single web component. Just include the script and embed your videos with one HTML tag.
-                    </p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3 class="feature-title">Fully Responsive</h3>
-                    <p class="feature-description">
-                        Works perfectly on desktop, tablet, and mobile. Your content looks great everywhere.
-                    </p>
-                </div>
-            </div>
-        </section>
+<section class="features">
+    <h2 class="section-title">Why Sponsorcast?</h2>
+    <p class="section-subtitle">The easiest way to deliver private, high-quality video to your GitHub Sponsors — no friction, just code.</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <h3 class="feature-title">Verified Sponsor Access</h3>
+            <p class="feature-description">
+                No passwords. No emails. Sponsorcast uses GitHub’s GraphQL API to authenticate your sponsors securely and instantly.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🎞️</div>
+            <h3 class="feature-title">High-Performance HLS</h3>
+            <p class="feature-description">
+                Adaptive bitrate streaming, powered by HLS.js and modern CDN delivery. Your videos load fast and look sharp everywhere.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🧩</div>
+            <h3 class="feature-title">Drop-In Web Component</h3>
+            <p class="feature-description">
+                One line of code. One tag. That’s all it takes to embed protected videos — no frameworks or build tools required.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3 class="feature-title">Made for All Devices</h3>
+            <p class="feature-description">
+                Fully responsive and mobile-friendly. Your screencasts look perfect on desktop, tablet, and phone — always.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3 class="feature-title">Optimized for Dev Workflows</h3>
+            <p class="feature-description">
+                CLI-ready, GitHub-friendly, and Vercel-native. Sponsorcast fits into your open source flow with zero friction.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3 class="feature-title">Privacy-First by Design</h3>
+            <p class="feature-description">
+                No tracking. No cookies. No personal data. Built to respect your users and your values — powered by EthicalMetrics (soon).
+            </p>
+        </div>
+    </div>
+</section>
+
 
         <!-- Quick Start -->
         <section class="code-section">
@@ -475,7 +534,7 @@
             <div class="code-block">
 <span class="code-comment">&lt;!-- Include required scripts --&gt;</span>
 <span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-string">"https://cdn.jsdelivr.net/npm/hls.js@latest"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
-<span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-string">"https://your-domain.com/sponsorcast.js"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
+<span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-string">"https://sponsorcast.vercel.app/sponsorcast.js"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
 
 <span class="code-comment">&lt;!-- Embed protected video --&gt;</span>
 <span class="code-tag">&lt;sponsor-cast</span> 
@@ -534,13 +593,12 @@
                 Non-sponsors will see the sponsorship prompt.
             </div>
             
-            <div class="demo-video">
                 <sponsor-cast 
-                    src="local-test"
+                    src="vimeo-475068701-480x270-c730ec86-45b874d1"
                     github-user="livrasand"
                     width="100%">
                 </sponsor-cast>
-            </div>
+            
         </section>
 
         <!-- Setup -->
@@ -548,45 +606,49 @@
             <h2 class="setup-title">Setup Instructions</h2>
             
             <ol class="setup-steps">
-                <li class="setup-step">
-                    <div class="step-title">Deploy to Vercel</div>
-                    <div class="step-description">Fork the repository and deploy to Vercel with one click</div>
-                </li>
-                
-                <li class="setup-step">
-                    <div class="step-title">Create GitHub OAuth App</div>
-                    <div class="step-description">Set up a new OAuth application in your GitHub developer settings</div>
-                </li>
-                
-                <li class="setup-step">
-                    <div class="step-title">Configure Environment Variables</div>
-                    <div class="step-description">Add the following variables to your Vercel deployment:</div>
-                    <div class="code-block" style="margin-top: 12px;">
-GITHUB_CLIENT_ID=your_oauth_app_id
-GITHUB_CLIENT_SECRET=your_oauth_app_secret  
-GITHUB_USER=your_username
-JWT_SECRET=random_secret_string
-HOST=https://your-domain.com</div>
-                </li>
-                
-                <li class="setup-step">
-                    <div class="step-title">Upload Videos</div>
-                    <div class="step-description">Use sponsorcast-cli or manually upload HLS files to the videos folder</div>
-                </li>
-            </ol>
+    <li class="setup-step">
+        <div class="step-title">1. Sign Up for Sponsorcast</div>
+        <div class="step-description">
+            Create your free account at <a href="https://sponsorcast.vercel.app/signup.html" target="_blank">sponsorcast.vercel.app</a>. You'll connect your GitHub account and select the user or organization you want to link with Sponsorcast.
+        </div>
+    </li>
 
-            <div class="success-banner">
-                <div class="success-title">Production Ready</div>
-                <p>Your Sponsorcast instance includes:</p>
-                <ul class="success-features">
-                    <li>Dynamic github-user parameters</li>
-                    <li>Secure JWT authentication</li>
-                    <li>HLS video streaming</li>
-                    <li>Responsive design</li>
-                    <li>Error handling</li>
-                    <li>CLI integration ready</li>
-                </ul>
-            </div>
+    <li class="setup-step">
+        <div class="step-title">2. Install Sponsorcast CLI</div>
+        <div class="step-description">
+            Make sure you have <strong>Node.js 16+</strong> and <strong>FFmpeg</strong> installed. Then install the CLI globally:
+        </div>
+        <div class="code-block">
+npm install -g sponsorcast-cli
+        </div>
+    </li>
+
+    <li class="setup-step">
+        <div class="step-title">3. Upload Your Video</div>
+        <div class="step-description">
+            Use the CLI to convert your video to HLS format and upload it to Sponsorcast. Example:
+        </div>
+        <div class="code-block">
+sponsorcast upload --video ./my-video.mp4
+        </div>
+        <div class="step-description">
+            Optionally add a custom title and thumbnail:
+        </div>
+        <div class="code-block">
+sponsorcast upload --video ./my-video.mp4 --name "My GitHub Tutorial" --thumbnail ./thumb.jpg
+        </div>
+    </li>
+
+    <li class="setup-step">
+        <div class="step-title">4. Embed on Your Website</div>
+        <div class="step-description">
+            Just copy and paste this into your site. Your video will only be visible to verified GitHub Sponsors.
+        </div>
+    </li>
+</ol>
+
+
+            
         </section>
     </div>
 

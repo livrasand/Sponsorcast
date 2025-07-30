@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import os from 'os';
 import { createId } from '@paralleldrive/cuid2';
+import { uploadToR2 } from '@/lib/r2-client';
 
 export const config = {
   api: {
@@ -16,10 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // En Vercel, usar directorio temporal en lugar de process.cwd()
     const uploadRoot = path.join(os.tmpdir(), 'sponsorcast-uploads');
-
-    // Verifica si la carpeta raíz existe, si no la crea
     if (!fs.existsSync(uploadRoot)) {
       fs.mkdirSync(uploadRoot, { recursive: true });
     }
@@ -35,37 +33,37 @@ export default async function handler(req, res) {
     const videoId = fields.videoId?.[0] || createId();
     const githubUser = fields.githubUser?.[0] || process.env.GITHUB_USER;
 
-    // Crear directorio para el video
-    const videoDir = path.join(uploadRoot, videoId);
-    if (!fs.existsSync(videoDir)) {
-      fs.mkdirSync(videoDir, { recursive: true });
-    }
-
     const uploadedFiles = [];
     let hasManifest = false;
 
-    // Procesar archivos subidos
     for (const [fieldName, fileArray] of Object.entries(files)) {
       const fileList = Array.isArray(fileArray) ? fileArray : [fileArray];
-      
+
       for (const file of fileList) {
         const filename = file.originalFilename || file.newFilename;
-        const finalPath = path.join(videoDir, filename);
-        
-        // Mover archivo al directorio final
-        fs.renameSync(file.filepath, finalPath);
-        
+        const buffer = fs.readFileSync(file.filepath);
+
+        const contentType = filename.endsWith('.m3u8')
+          ? 'application/vnd.apple.mpegurl'
+          : filename.endsWith('.ts')
+            ? 'video/MP2T'
+            : 'application/octet-stream';
+
+        const publicUrl = await uploadToR2(videoId, filename, buffer, contentType);
+
         if (filename.endsWith('.m3u8')) {
           hasManifest = true;
         }
-        
+
         uploadedFiles.push({
           fieldName,
           originalName: file.originalFilename,
           filename,
           size: file.size,
-          path: finalPath
+          url: publicUrl
         });
+
+        fs.unlinkSync(file.filepath); // eliminar archivo temporal
       }
     }
 
@@ -85,11 +83,7 @@ export default async function handler(req, res) {
       totalSize: uploadedFiles.reduce((sum, f) => sum + f.size, 0)
     };
 
-    // Guardar metadata
-    fs.writeFileSync(
-      path.join(videoDir, 'metadata.json'),
-      JSON.stringify(metadata, null, 2)
-    );
+    await uploadToR2(videoId, 'metadata.json', JSON.stringify(metadata, null, 2), 'application/json');
 
     res.status(200).json({
       success: true,
