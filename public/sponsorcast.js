@@ -1,66 +1,119 @@
 class SponsorCast extends HTMLElement {
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-  }
-
-  async connectedCallback() {
-    const src = this.getAttribute('src'); // ID del video
-    const githubUser = this.getAttribute('github-user'); // Usuario dinámico
-    const autoplay = this.hasAttribute('autoplay');
-    const width = this.getAttribute('width') || '720';
-    const height = this.getAttribute('height') || 'auto';
-    
-    if (!src) {
-      this.showError('Missing required "src" attribute');
-      return;
-    }
-    
-    if (!githubUser) {
-      this.showError('Missing required "github-user" attribute');
-      return;
+    constructor() {
+        super();
+        this.attachShadow({
+            mode: 'open'
+        });
     }
 
-    const container = document.createElement('div');
-    this.shadowRoot.appendChild(container);
-    
-    // Aplicar estilos
-    this.addStyles();
-    
-    this.showLoading(container);
+    async connectedCallback() {
+        const src = this.getAttribute('src');
+        const githubUser = this.getAttribute('github-user');
+        const autoplay = this.hasAttribute('autoplay');
+        const width = this.getAttribute('width') || '720';
+        const height = this.getAttribute('height') || 'auto';
 
-    // Detectar entorno y construir URLs
-    const baseURL = this.getBaseURL();
+        if (!src) {
+            this.showError('Missing required "src" attribute');
+            return;
+        }
 
-    try {
-      // Validar si tiene acceso para este usuario específico
-      const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`);
-      
-      if (!authRes.ok) {
-        this.showSponsorRequired(container, baseURL, githubUser);
-        return;
-      }
+        if (!githubUser) {
+            this.showError('Missing required "github-user" attribute');
+            return;
+        }
 
-      // Usuario autorizado - mostrar video
-      await this.showVideo(container, baseURL, src, autoplay, width, height);
-      
-    } catch (err) {
-      this.showError(`Network error: ${err.message}`);
+        const container = document.createElement('div');
+        this.shadowRoot.appendChild(container);
+
+        this.addStyles();
+        this.showLoading(container);
+
+        const baseURL = this.getBaseURL();
+
+        try {
+            // ✨ NUEVO: Verificar si hay token en la URL (callback dinámico)
+            const urlParams = new URLSearchParams(window.location.search);
+            const sponsorStatus = urlParams.get('sponsor_status');
+            const sponsorToken = urlParams.get('sponsor_token');
+            const errorParam = urlParams.get('error');
+
+            // Si hay parámetros de callback, procesarlos
+            if (sponsorStatus !== null) {
+                // Limpiar la URL de parámetros de callback
+                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+
+                if (sponsorStatus === 'true' && sponsorToken) {
+                    // Guardar token en localStorage para uso futuro
+                    localStorage.setItem(`sponsor_token_${githubUser}`, sponsorToken);
+                    localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000)); // 55 min
+
+                    await this.showVideo(container, baseURL, src, autoplay, width, height);
+                    return;
+                } else if (errorParam) {
+                    const errorMessage = urlParams.get('message') || 'Authentication failed';
+                    this.showError(`Authentication error: ${errorMessage}`);
+                    return;
+                }
+            }
+
+            // Verificar token almacenado localmente
+            const storedToken = localStorage.getItem(`sponsor_token_${githubUser}`);
+            const tokenExpires = localStorage.getItem(`sponsor_token_${githubUser}_expires`);
+
+            if (storedToken && tokenExpires && Date.now() < parseInt(tokenExpires)) {
+                // Token válido en localStorage, verificar con el servidor
+                const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${storedToken}`
+                    }
+                });
+
+                if (authRes.ok) {
+                    await this.showVideo(container, baseURL, src, autoplay, width, height);
+                    return;
+                } else {
+                    // Token inválido, limpiar localStorage
+                    localStorage.removeItem(`sponsor_token_${githubUser}`);
+                    localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
+                }
+            }
+
+            // No hay token válido, mostrar CTA de sponsor
+            this.showSponsorRequired(container, baseURL, githubUser);
+
+        } catch (err) {
+            this.showError(`Network error: ${err.message}`);
+        }
     }
-  }
-  
-  getBaseURL() {
-    // En desarrollo
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      return `${location.protocol}//${location.host}`;
+
+    // ✨ NUEVO: Limpiar parámetros de URL después del callback
+    cleanUrlParams(paramsToRemove) {
+        const url = new URL(window.location.href);
+        let hasChanges = false;
+
+        paramsToRemove.forEach(param => {
+            if (url.searchParams.has(param)) {
+                url.searchParams.delete(param);
+                hasChanges = true;
+            }
+        });
+
+        if (hasChanges) {
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+        }
     }
-    // En producción - usar rutas relativas
-    return '';
-  }
-  
-  addStyles() {
-  const style = document.createElement('style');
-  style.textContent = `
+
+    getBaseURL() {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            return `${location.protocol}//${location.host}`;
+        }
+        return 'https://sponsorcast.vercel.app';
+    }
+
+    addStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
     :host {
       display: block;
       font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
@@ -335,20 +388,20 @@ class SponsorCast extends HTMLElement {
       }
     }
   `;
-  this.shadowRoot.appendChild(style);
-}
-  
-  showLoading(container) {
-    container.innerHTML = `
+        this.shadowRoot.appendChild(style);
+    }
+
+    showLoading(container) {
+        container.innerHTML = `
       <div class="loading">
         <div class="spinner"></div>
         Checking sponsorship status...
       </div>
     `;
-  }
-  
-  showSponsorRequired(container, baseURL, githubUser) {
-    container.innerHTML = `
+    }
+
+    showSponsorRequired(container, baseURL, githubUser) {
+        container.innerHTML = `
       <div class="sponsor-required">
         <h3>Almost there!</h3>
         <p>Sign in to GitHub to access these screencasts from <strong>@${githubUser}</strong>.</p>
@@ -357,47 +410,45 @@ class SponsorCast extends HTMLElement {
         </a>
       </div>
     `;
-  }
-  
-  async showVideo(container, baseURL, src, autoplay, width, height) {
-    const video = document.createElement('video');
-    video.controls = true;
-    video.style.width = width.includes('%') || width.includes('px') ? width : `${width}px`;
-    if (height !== 'auto') {
-      video.style.height = height.includes('%') || height.includes('px') ? height : `${height}px`;
-    }
-    if (autoplay) {
-      video.autoplay = true;
-      video.muted = true; // Required for autoplay in most browsers
     }
 
-    const playlistURL = `https://pub-2936dd6a3cb4488da476731228bbb559.r2.dev/${src}/playlist.m3u8`;
-    
-    // Verificar si HLS.js está cargado
-    if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(playlistURL);
-      hls.attachMedia(video);
-      
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) {
-          this.showError('Video playback error. Please try again.');
+    async showVideo(container, baseURL, src, autoplay, width, height) {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.style.width = width.includes('%') || width.includes('px') ? width : `${width}px`;
+        if (height !== 'auto') {
+            video.style.height = height.includes('%') || height.includes('px') ? height : `${height}px`;
         }
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari nativo
-      video.src = playlistURL;
-    } else {
-      this.showError('Your browser does not support HLS video playback. Please use a modern browser.');
-      return;
+        if (autoplay) {
+            video.autoplay = true;
+            video.muted = true;
+        }
+
+        const playlistURL = `https://pub-2936dd6a3cb4488da476731228bbb559.r2.dev/${src}/playlist.m3u8`;
+
+        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(playlistURL);
+            hls.attachMedia(video);
+
+            hls.on(Hls.Events.ERROR, (event, data) => {
+                if (data.fatal) {
+                    this.showError('Video playback error. Please try again.');
+                }
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = playlistURL;
+        } else {
+            this.showError('Your browser does not support HLS video playback. Please use a modern browser.');
+            return;
+        }
+
+        container.innerHTML = '';
+        container.appendChild(video);
     }
 
-    container.innerHTML = '';
-    container.appendChild(video);
-  }
-  
-  showError(message) {
-    this.shadowRoot.innerHTML = `
+    showError(message) {
+        this.shadowRoot.innerHTML = `
       <style>
         :host {
           --bg-primary: #0d1117;
@@ -626,20 +677,19 @@ class SponsorCast extends HTMLElement {
         ${this.shouldShowErrorCode(message) ? `<code class="error-code">ERROR_${Date.now()}</code>` : ''}
       </div>
     `;
-  }
+    }
 
-  // Métodos auxiliares para mejorar la funcionalidad
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-  shouldShowErrorCode(message) {
-    // Mostrar código de error para mensajes técnicos
-    const technicalKeywords = ['failed', 'error', 'exception', 'timeout', 'network', 'server', 'api'];
-    return technicalKeywords.some(keyword => message.toLowerCase().includes(keyword));
-  }
+    shouldShowErrorCode(message) {
+        // Mostrar código de error para mensajes técnicos
+        const technicalKeywords = ['failed', 'error', 'exception', 'timeout', 'network', 'server', 'api'];
+        return technicalKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
 }
 
 customElements.define('sponsor-cast', SponsorCast);
