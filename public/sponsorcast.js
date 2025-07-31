@@ -7,85 +7,88 @@ class SponsorCast extends HTMLElement {
     }
 
     async connectedCallback() {
-        const src = this.getAttribute('src');
-        const githubUser = this.getAttribute('github-user');
-        const autoplay = this.hasAttribute('autoplay');
-        const width = this.getAttribute('width') || '720';
-        const height = this.getAttribute('height') || 'auto';
+      const src = this.getAttribute('src');
+      const githubUser = this.getAttribute('github-user');
+      const autoplay = this.hasAttribute('autoplay');
+      const width = this.getAttribute('width') || '720';
+      const height = this.getAttribute('height') || 'auto';
 
-        if (!src) {
-            this.showError('Missing required "src" attribute');
-            return;
-        }
+      if (!src) {
+          this.showError('Missing required "src" attribute');
+          return;
+      }
 
-        if (!githubUser) {
-            this.showError('Missing required "github-user" attribute');
-            return;
-        }
+      if (!githubUser) {
+          this.showError('Missing required "github-user" attribute');
+          return;
+      }
 
-        const container = document.createElement('div');
-        this.shadowRoot.appendChild(container);
+      const container = document.createElement('div');
+      this.shadowRoot.appendChild(container);
 
-        this.addStyles();
-        this.showLoading(container);
+      this.addStyles();
+      this.showLoading(container);
 
-        const baseURL = this.getBaseURL();
+      const baseURL = this.getBaseURL();
 
-        try {
-            // ✨ NUEVO: Verificar si hay token en la URL (callback dinámico)
-            const urlParams = new URLSearchParams(window.location.search);
-            const sponsorStatus = urlParams.get('sponsor_status');
-            const sponsorToken = urlParams.get('sponsor_token');
-            const errorParam = urlParams.get('error');
+      try {
+          // 1. Revisa si vienes del callback de GitHub con un token nuevo
+          const urlParams = new URLSearchParams(window.location.search);
+          const sponsorStatus = urlParams.get('sponsor_status');
+          const sponsorToken = urlParams.get('sponsor_token');
 
-            // Si hay parámetros de callback, procesarlos
-            if (sponsorStatus !== null) {
-                // Limpiar la URL de parámetros de callback
-                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+          if (sponsorStatus === 'true' && sponsorToken) {
+              this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+              localStorage.setItem(`sponsor_token_${githubUser}`, sponsorToken);
+              localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000)); // 55 min
+              await this.showVideo(container, baseURL, src, autoplay, width, height);
+              return;
+          }
 
-                if (sponsorStatus === 'true' && sponsorToken) {
-                    // Guardar token en localStorage para uso futuro
-                    localStorage.setItem(`sponsor_token_${githubUser}`, sponsorToken);
-                    localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000)); // 55 min
+          // 2. Revisa si existe un token guardado en localStorage y si es válido
+          const storedToken = localStorage.getItem(`sponsor_token_${githubUser}`);
+          const tokenExpires = localStorage.getItem(`sponsor_token_${githubUser}_expires`);
 
-                    await this.showVideo(container, baseURL, src, autoplay, width, height);
-                    return;
-                } else if (errorParam) {
-                    const errorMessage = urlParams.get('message') || 'Authentication failed';
-                    this.showError(`Authentication error: ${errorMessage}`);
-                    return;
-                }
-            }
+          if (storedToken && tokenExpires && Date.now() < parseInt(tokenExpires)) {
+              const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
+                  headers: {
+                      'Authorization': `Bearer ${storedToken}`
+                  }
+              });
 
-            // Verificar token almacenado localmente
-            const storedToken = localStorage.getItem(`sponsor_token_${githubUser}`);
-            const tokenExpires = localStorage.getItem(`sponsor_token_${githubUser}_expires`);
+              if (authRes.ok) {
+                  await this.showVideo(container, baseURL, src, autoplay, width, height);
+                  return; // ¡Éxito con el token!
+              } else {
+                  // El token es inválido o expiró, lo limpiamos
+                  localStorage.removeItem(`sponsor_token_${githubUser}`);
+                  localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
+              }
+          }
+          
+          // 3. ✨ LÓGICA ANTIGUA COMO RESPALDO ✨
+          // Si no hay token o el token fue inválido, intenta el método antiguo (basado en cookies/sesión)
+          const legacyAuthRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`);
+          if (legacyAuthRes.ok) {
+              await this.showVideo(container, baseURL, src, autoplay, width, height);
+              return; // ¡Éxito con el método antiguo!
+          }
 
-            if (storedToken && tokenExpires && Date.now() < parseInt(tokenExpires)) {
-                // Token válido en localStorage, verificar con el servidor
-                const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
-                    headers: {
-                        'Authorization': `Bearer ${storedToken}`
-                    }
-                });
+          // 4. Si nada de lo anterior funcionó, el usuario no está autorizado.
+          this.showSponsorRequired(container, baseURL, githubUser);
 
-                if (authRes.ok) {
-                    await this.showVideo(container, baseURL, src, autoplay, width, height);
-                    return;
-                } else {
-                    // Token inválido, limpiar localStorage
-                    localStorage.removeItem(`sponsor_token_${githubUser}`);
-                    localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
-                }
-            }
-
-            // No hay token válido, mostrar CTA de sponsor
-            this.showSponsorRequired(container, baseURL, githubUser);
-
-        } catch (err) {
-            this.showError(`Network error: ${err.message}`);
-        }
-    }
+      } catch (err) {
+          // Manejo de errores de red generales
+          const errorParam = new URLSearchParams(window.location.search).get('error');
+          if (errorParam) {
+              const errorMessage = new URLSearchParams(window.location.search).get('message') || 'Authentication failed';
+              this.showError(`Authentication error: ${errorMessage}`);
+              this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+          } else {
+              this.showError(`Network error: ${err.message}`);
+          }
+      }
+  }
 
     // ✨ NUEVO: Limpiar parámetros de URL después del callback
     cleanUrlParams(paramsToRemove) {
