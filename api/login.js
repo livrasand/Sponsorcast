@@ -1,12 +1,14 @@
 export default function handler(req, res) {
   const client_id = process.env.GITHUB_CLIENT_ID;
   const githubUser = req.query['github-user'] || process.env.GITHUB_USER;
-  const redirect_uri = `${process.env.HOST || 'http://localhost:3000'}/api/callback`;
   
-  // Capturar el redirect_uri dinámico del sitio web del usuario
+  // Siempre usar la URL registrada en GitHub OAuth App
+  const redirect_uri = `${process.env.HOST || 'https://sponsorcast.vercel.app'}/api/callback`;
+  
+  // Capturo el redirect_uri dinámico del sitio web del usuario
   const dynamicRedirect = req.query['redirect_uri'];
   
-  // Incluir tanto el github-user como el redirect_uri dinámico en el state
+  // Incluyo tanto el github-user como el redirect_uri dinámico en el state
   const stateData = { 
     githubUser,
     redirectUri: dynamicRedirect || null // El sitio web al que regresar

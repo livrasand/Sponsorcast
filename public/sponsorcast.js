@@ -104,7 +104,6 @@ class SponsorCast extends HTMLElement {
         }
     }
 
-    // ✨ NUEVO: Limpiar parámetros de URL después del callback
     cleanUrlParams(paramsToRemove) {
         const url = new URL(window.location.href);
         let hasChanges = false;
@@ -117,7 +116,8 @@ class SponsorCast extends HTMLElement {
         });
 
         if (hasChanges) {
-            window.history.replaceState({}, document.title, url.pathname + url.search);
+            const newUrl = url.pathname + (url.search || '') + (url.hash || '');
+            window.history.replaceState({}, document.title, newUrl);
         }
     }
 
@@ -827,7 +827,7 @@ class SponsorCast extends HTMLElement {
       <div class="sponsor-required">
         <h3>Almost there!</h3>
         <p>Sign in to GitHub to access these screencasts from <strong>@${githubUser}</strong>.</p>
-        <a href="${baseURL}/api/login?github-user=${encodeURIComponent(githubUser)}&redirect_uri=${encodeURIComponent(currentUrl)}" 
+        <a href="${baseURL}/api/login?github-user=${encodeURIComponent(githubUser)}&redirect_uri=${encodeURIComponent(currentUrl)}"
            target="_blank" class="sponsor-btn">
           Continue with Github
         </a>
