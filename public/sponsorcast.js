@@ -122,11 +122,9 @@ class SponsorCast extends HTMLElement {
     }
 
     getBaseURL() {
-        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-            return `${location.protocol}//${location.host}`;
-        }
         return 'https://sponsorcast.vercel.app';
     }
+
 
     addStyles() {
         const style = document.createElement('style');

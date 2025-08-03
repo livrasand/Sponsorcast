@@ -1,7 +1,10 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { applyCORS } from '../lib/cors.js';
 
 export default function handler(req, res) {
+  if (applyCORS(req, res)) return;
+  
   const { 
     'github-user': githubUser, 
     redirect_uri: redirectUri,

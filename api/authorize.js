@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
+import { applyCORS } from '../lib/cors.js';
 
 export default function handler(req, res) {
+  if (applyCORS(req, res)) return;
+  
   const githubUser = req.query['github-user'] || process.env.GITHUB_USER;
   
   // Método 1: Verificar token Bearer en header Authorization
