@@ -1424,7 +1424,6 @@ class SponsorCast extends HTMLElement {
       </style>
       <div class="error-container" role="alert" aria-live="assertive">
         <div class="error-icon" aria-hidden="true">!</div>
-        <button class="error-dismiss" onclick="this.closest(':host').remove()" aria-label="Dismiss error">×</button>
         <p class="error-message">${this.escapeHtml(message)}</p>
         ${this.shouldShowErrorCode(message) ? `<code class="error-code">ERROR_${Date.now()}</code>` : ''}
       </div>
