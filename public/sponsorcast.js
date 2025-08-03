@@ -6,89 +6,103 @@ class SponsorCast extends HTMLElement {
         });
     }
 
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
     async connectedCallback() {
-      const src = this.getAttribute('src');
-      const githubUser = this.getAttribute('github-user');
-      const autoplay = this.hasAttribute('autoplay');
-      const width = this.getAttribute('width') || '720';
-      const height = this.getAttribute('height') || 'auto';
+        const src = this.getAttribute('src');
+        const githubUser = this.getAttribute('github-user');
+        const autoplay = this.hasAttribute('autoplay');
+        const width = this.getAttribute('width') || '720';
+        const height = this.getAttribute('height') || 'auto';
 
-      if (!src) {
-          this.showError('Missing required "src" attribute');
-          return;
-      }
+        if (!src) {
+            this.showError('Missing required "src" attribute');
+            return;
+        }
 
-      if (!githubUser) {
-          this.showError('Missing required "github-user" attribute');
-          return;
-      }
+        if (!githubUser) {
+            this.showError('Missing required "github-user" attribute');
+            return;
+        }
 
-      const container = document.createElement('div');
-      this.shadowRoot.appendChild(container);
+        const container = document.createElement('div');
+        this.shadowRoot.appendChild(container);
 
-      this.addStyles();
-      this.showLoading(container);
+        this.addStyles();
+        this.showLoading(container);
 
-      const baseURL = this.getBaseURL();
+        const baseURL = this.getBaseURL();
 
-      try {
-          // 1. Revisa si vienes del callback de GitHub con un token nuevo
-          const urlParams = new URLSearchParams(window.location.search);
-          const sponsorStatus = urlParams.get('sponsor_status');
-          const sponsorToken = urlParams.get('sponsor_token');
+        try {
+            // 1. Revisa si vienes del callback de GitHub con un token nuevo
+            const urlParams = new URLSearchParams(window.location.search);
+            const sponsorStatus = urlParams.get('sponsor_status');
+            const sponsorToken = urlParams.get('sponsor_token');
+            const visitorLogin = urlParams.get('visitor_login');
 
-          if (sponsorStatus === 'true' && sponsorToken) {
-              this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
-              localStorage.setItem(`sponsor_token_${githubUser}`, sponsorToken);
-              localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000)); // 55 min
-              await this.showVideo(container, baseURL, src, autoplay, width, height);
-              return;
-          }
+            if (sponsorStatus === 'true' && sponsorToken) {
+                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+                localStorage.setItem(`sponsor_token_${githubUser}`, sponsorToken);
+                localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000)); // 55 min
 
-          // 2. Revisa si existe un token guardado en localStorage y si es válido
-          const storedToken = localStorage.getItem(`sponsor_token_${githubUser}`);
-          const tokenExpires = localStorage.getItem(`sponsor_token_${githubUser}_expires`);
+                // Guardar también el visitor_login si está presente
+                if (visitorLogin) {
+                    localStorage.setItem(`visitor_login_${githubUser}`, visitorLogin);
+                }
 
-          if (storedToken && tokenExpires && Date.now() < parseInt(tokenExpires)) {
-              const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
-                  headers: {
-                      'Authorization': `Bearer ${storedToken}`
-                  }
-              });
+                await this.showVideo(container, baseURL, src, autoplay, width, height);
+                return;
+            }
 
-              if (authRes.ok) {
-                  await this.showVideo(container, baseURL, src, autoplay, width, height);
-                  return; // ¡Éxito con el token!
-              } else {
-                  // El token es inválido o expiró, lo limpiamos
-                  localStorage.removeItem(`sponsor_token_${githubUser}`);
-                  localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
-              }
-          }
-          
-          // 3. ✨ LÓGICA ANTIGUA COMO RESPALDO ✨
-          // Si no hay token o el token fue inválido, intenta el método antiguo (basado en cookies/sesión)
-          const legacyAuthRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`);
-          if (legacyAuthRes.ok) {
-              await this.showVideo(container, baseURL, src, autoplay, width, height);
-              return; // ¡Éxito con el método antiguo!
-          }
+            // 2. Revisa si existe un token guardado en localStorage y si es válido
+            const storedToken = localStorage.getItem(`sponsor_token_${githubUser}`);
+            const tokenExpires = localStorage.getItem(`sponsor_token_${githubUser}_expires`);
 
-          // 4. Si nada de lo anterior funcionó, el usuario no está autorizado.
-          this.showSponsorRequired(container, baseURL, githubUser);
+            if (storedToken && tokenExpires && Date.now() < parseInt(tokenExpires)) {
+                const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
+                    headers: {
+                        'Authorization': `Bearer ${storedToken}`
+                    }
+                });
 
-      } catch (err) {
-          // Manejo de errores de red generales
-          const errorParam = new URLSearchParams(window.location.search).get('error');
-          if (errorParam) {
-              const errorMessage = new URLSearchParams(window.location.search).get('message') || 'Authentication failed';
-              this.showError(`Authentication error: ${errorMessage}`);
-              this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
-          } else {
-              this.showError(`Network error: ${err.message}`);
-          }
-      }
-  }
+                if (authRes.ok) {
+                    await this.showVideo(container, baseURL, src, autoplay, width, height);
+                    return; // ¡Éxito con el token!
+                } else {
+                    // El token es inválido o expiró, lo limpiamos
+                    localStorage.removeItem(`sponsor_token_${githubUser}`);
+                    localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
+                    localStorage.removeItem(`visitor_login_${githubUser}`);
+                }
+            }
+
+            // 3. ✨ LÓGICA ANTIGUA COMO RESPALDO ✨
+            // Si no hay token o el token fue inválido, intenta el método antiguo (basado en cookies/sesión)
+            const legacyAuthRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`);
+            if (legacyAuthRes.ok) {
+                await this.showVideo(container, baseURL, src, autoplay, width, height);
+                return; // ¡Éxito con el método antiguo!
+            }
+
+            // 4. Si nada de lo anterior funcionó, el usuario no está autorizado.
+            this.showSponsorRequired(container, baseURL, githubUser);
+
+        } catch (err) {
+            // Manejo de errores de red generales
+            const errorParam = new URLSearchParams(window.location.search).get('error');
+            if (errorParam) {
+                const errorMessage = new URLSearchParams(window.location.search).get('message') || 'Authentication failed';
+                this.showError(`Authentication error: ${errorMessage}`);
+                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+            } else {
+                this.showError(`Network error: ${err.message}`);
+            }
+        }
+    }
 
     // ✨ NUEVO: Limpiar parámetros de URL después del callback
     cleanUrlParams(paramsToRemove) {
@@ -146,7 +160,7 @@ class SponsorCast extends HTMLElement {
         --bg-tertiary: #eaeef2;
         --text-primary: #24292f;
         --text-secondary: #656d76;
-        --accent-primary: #0969da;
+        --accent-primary: #00adef;
         --accent-secondary: #1a7f37;
         --accent-danger: #cf222e;
         --accent-warning: #9a6700;
@@ -179,8 +193,8 @@ class SponsorCast extends HTMLElement {
       top: 0;
       left: -100%;
       width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-primary), var(--accent-secondary), var(--accent-warning), transparent);
       animation: shimmer 2s infinite;
     }
 
@@ -376,7 +390,6 @@ class SponsorCast extends HTMLElement {
       }
     }
 
-    /* Focus management for accessibility */
     *:focus-visible {
       outline: 2px solid var(--accent-primary);
       outline-offset: 2px;
@@ -390,6 +403,410 @@ class SponsorCast extends HTMLElement {
         break-inside: avoid;
       }
     }
+
+    .video-wrapper {
+  position: relative;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-primary);
+}
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  backdrop-filter: blur(4px);
+}
+
+
+.video-wrapper:hover .controls,
+.video-wrapper:focus-within .controls {
+  opacity: 1;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.controls input[type=range] {
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+#progress {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  cursor: pointer;
+  margin: 8px 0;
+  position: relative;
+}
+
+#progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+}
+
+#progress::-moz-range-thumb {
+  width: 0;
+  height: 0;
+}
+
+#progress::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.progress-wrapper {
+  overflow: visible; 
+  width: 100%;
+}
+
+.progress-container {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: visible; 
+  flex-grow: 1;
+  cursor: pointer;
+}
+
+
+.progress-container:hover {
+  height: 8px;
+}
+
+.progress-bar {
+  position: absolute;
+  height: 100%;
+  background: var(--accent-primary);
+  transition: height 0.2s ease-in-out;
+  border-radius: 10em;
+}
+
+.buffered-bar {
+  position: absolute;
+  height: 100%;
+  background: #ffffff33;
+  transition: width 175ms cubic-bezier(0.18, 0, 0.07, 1), height 0.2s ease-in-out;
+  border-radius: 10em;
+}
+
+.playIcon, .pauseIcon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.playIcon .fill, .pauseIcon .fill {
+  fill: white;
+  transition: fill 0.2s ease;
+}
+
+.controls button:hover .playIcon .fill, 
+.controls button:hover .pauseIcon .fill {
+  fill: black;
+}
+
+.enter-fullscreen-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.enter-fullscreen-icon path {
+  fill: white;
+  transition: fill 0.2s ease;
+}
+
+#fullscreen:hover .enter-fullscreen-icon path,
+#fullscreen:focus .enter-fullscreen-icon path {
+  fill: var(--accent-primary);
+}
+
+.video-wrapper:fullscreen .enter-fullscreen-icon path {
+  fill: var(--accent-secondary);
+}
+
+.enter-fullscreen-icon path {
+  fill: white;
+}
+
+/* Estilos para los íconos de pantalla completa */
+.enter-fullscreen-icon, 
+.exit-fullscreen-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.enter-fullscreen-icon path, 
+.exit-fullscreen-icon path {
+  fill: white;
+  transition: fill 0.2s ease;
+}
+
+#fullscreen:hover .enter-fullscreen-icon path,
+#fullscreen:hover .exit-fullscreen-icon path,
+#fullscreen:focus .enter-fullscreen-icon path,
+#fullscreen:focus .exit-fullscreen-icon path {
+  fill: var(--accent-primary);
+}
+
+/* Color diferente cuando está en pantalla completa */
+:fullscreen .exit-fullscreen-icon path {
+  fill: var(--accent-secondary);
+}
+
+          /* Estilos para el botón de play/pause */
+        #play {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.8em;
+            height: 1.8em;
+            margin: 0 0.8em 0 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 250ms ease-out, background-color 40ms, width 250ms ease-in-out, margin 250ms ease-in-out;
+            z-index: 23;
+            transform: translate3d(0, 0, 0);
+        }
+
+        #play:hover {
+            background-color: var(--accent-primary);
+        }
+
+        /* Estilos para eliminar outline por defecto */
+        body:not(.showfocus) .video-wrapper a,
+        body:not(.showfocus) .video-wrapper button,
+        body:not(.showfocus) .video-wrapper div,
+        body:not(.showfocus) .video-wrapper li,
+        body:not(.showfocus) .video-wrapper span,
+        body:not(.showfocus) .video-wrapper svg {
+            outline: 0 !important;
+        }
+
+        .video-wrapper a:active,
+        .video-wrapper button:active,
+        .video-wrapper button:not(:focus) {
+            outline: 0;
+        }
+
+          
+.timecode-container {
+    position: absolute;
+    bottom: 100%;
+    margin-bottom: 8px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+/* Tooltip de hover */
+.hover-timecode {
+    opacity: 0;
+}
+
+/* Tooltip del tiempo actual */
+.current-timecode {
+    opacity: 1;
+    display: none; /* Lo mostraremos solo cuando los controles estén visibles */
+}
+
+.timecode {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+          .timecode-current {
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 0.2em 0.4em;
+    line-height: 1.6em;
+    font-weight: 500;
+    position: relative;
+    left: 0;
+    display: inline-block;
+    font-size: 10px;
+    background: #fff;
+    color: #000;
+    cursor: grab;
+} 
+
+.timecode-current::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid rgba(255, 255, 255, 0.9);
+}
+
+.timecode::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid rgba(0, 0, 0, 0.9);
+}
+
+/* Mostrar tooltip actual cuando los controles estén visibles */
+.video-wrapper:hover .current-timecode {
+    display: block;
+}
+
+.pip-icon {
+                width: 25px;
+                height: 25px;
+                margin-right: -10px;
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+          .pip-icon:hover {
+          fill: var(--accent-primary);
+          }
+            
+            .sponsorcast-logo {
+          margin-top:5px;
+                display: inline-block;
+                vertical-align: middle;
+            }
+                      
+    /* Estilos para el control de volumen */
+.volume-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#volume-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+#volume-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.volume-slider-container {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 12px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  height: 100px;
+}
+
+.volume-container:hover .volume-slider-container {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#volume {
+  width: 80px;
+  height: 6px;
+  margin: 0 auto;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  transform: rotate(180deg);
+}
+
+#volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#volume::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volume-icon {
+  width: 24px;
+  height: 24px;
+  fill: white;
+  transition: fill 0.2s ease;
+}
+
+#volume-btn:hover .volume-icon {
+  fill: var(--accent-primary);
+}        
   `;
         this.shadowRoot.appendChild(style);
     }
@@ -404,11 +821,14 @@ class SponsorCast extends HTMLElement {
     }
 
     showSponsorRequired(container, baseURL, githubUser) {
+        const currentUrl = window.location.href.split('?')[0]; // URL sin parámetros
+
         container.innerHTML = `
       <div class="sponsor-required">
         <h3>Almost there!</h3>
         <p>Sign in to GitHub to access these screencasts from <strong>@${githubUser}</strong>.</p>
-        <a href="${baseURL}/api/login?github-user=${encodeURIComponent(githubUser)}" target="_blank" class="sponsor-btn">
+        <a href="${baseURL}/api/login?github-user=${encodeURIComponent(githubUser)}&redirect_uri=${encodeURIComponent(currentUrl)}" 
+           target="_blank" class="sponsor-btn">
           Continue with Github
         </a>
       </div>
@@ -416,8 +836,13 @@ class SponsorCast extends HTMLElement {
     }
 
     async showVideo(container, baseURL, src, autoplay, width, height) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'video-wrapper';
+        wrapper.tabIndex = 0;
+
         const video = document.createElement('video');
-        video.controls = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('tabindex', '0');
         video.style.width = width.includes('%') || width.includes('px') ? width : `${width}px`;
         if (height !== 'auto') {
             video.style.height = height.includes('%') || height.includes('px') ? height : `${height}px`;
@@ -433,7 +858,6 @@ class SponsorCast extends HTMLElement {
             const hls = new Hls();
             hls.loadSource(playlistURL);
             hls.attachMedia(video);
-
             hls.on(Hls.Events.ERROR, (event, data) => {
                 if (data.fatal) {
                     this.showError('Video playback error. Please try again.');
@@ -446,9 +870,334 @@ class SponsorCast extends HTMLElement {
             return;
         }
 
+        wrapper.innerHTML = `
+  <div class="controls" role="group" aria-label="Video controls">
+    <button id="play" aria-label="Play/Pause"><svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-play-icon="true" class="playIcon"><path d="M19 12C19 12.3557 18.8111 12.6846 18.5039 12.8638L6.50387 19.8638C6.19458 20.0442 5.81243 20.0455 5.50194 19.8671C5.19145 19.6888 5 19.3581 5 19L5 5C5 4.64193 5.19145 4.3112 5.50194 4.13286C5.81243 3.95452 6.19458 3.9558 6.50387 4.13622L18.5039 11.1362C18.8111 11.3154 19 11.6443 19 12Z" class="fill"></path></svg></button>
+    <div class="progress-wrapper">
+      <div class="progress-container">
+        <div class="buffered-bar"></div>
+        <div class="progress-bar"></div>
+        <!-- Tooltip de preview (hover) -->
+        <div class="timecode-container hover-timecode" role="presentation" aria-hidden="true">
+          <div class="timecode">00:00</div>
+        </div>
+        <!-- Tooltip del tiempo actual -->
+        <div class="timecode-container current-timecode" role="presentation" aria-hidden="true">
+          <div class="timecode-current">00:00</div>
+        </div>
+        <input id="progress" type="range" min="0" max="100" value="0" aria-label="Progress">
+      </div>
+    </div>
+    <div class="volume-container">
+      <button id="volume-btn" aria-label="Volume">
+        <svg width="24" height="24" viewBox="0 0 24 24" data-volume-icon="true" class="volume-icon">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M20 12C20 15.7277 17.4505 18.8599 14 19.7479V21.7999C18.5645 20.8734 22 16.8379 22 12C22 7.16206 18.5645 3.12655 14 2.20001V4.25201C17.4505 5.1401 20 8.2723 20 12ZM18 12C18 9.38754 16.3304 7.16506 14 6.34139V8.53511C15.1956 9.22672 16 10.5194 16 12C16 13.4805 15.1956 14.7732 14 15.4648V17.6586C16.3304 16.8349 18 14.6124 18 12ZM6.58579 8.00396H4C2.89543 8.00396 2 8.89939 2 10.004V14.004C2 15.1085 2.89543 16.004 4 16.004H6.58579L10.2929 20.7111C10.9229 21.341 12 20.8949 12 20.004V4.00396C12 3.11305 10.9229 2.66689 10.2929 3.29685L6.58579 8.00396Z"></path>
+        </svg>
+      </button>
+      <div class="volume-slider-container">
+        <input id="volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume" orient="vertical">
+      </div>
+    </div>
+    <button id="pip" aria-label="Picture in Picture">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" data-enter-pip="true" class="pip-icon">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M3.33329 4.99992H16.6666V9.99992H18.3333V4.99992C18.3333 4.07944 17.5871 3.33325 16.6666 3.33325H3.33329C2.41282 3.33325 1.66663 4.07944 1.66663 4.99992V13.3333C1.66663 14.2537 2.41282 14.9999 3.33329 14.9999H8.33329V13.3333H3.33329V4.99992ZM9.99996 12.6666C9.99996 12.1143 10.4477 11.6666 11 11.6666H17.3333C17.8856 11.6666 18.3333 12.1143 18.3333 12.6666V17.3333C18.3333 17.8855 17.8856 18.3333 17.3333 18.3333H11C10.4477 18.3333 9.99996 17.8855 9.99996 17.3333V12.6666ZM7.91663 7.60408V8.59492L6.17079 6.84909C6.05829 6.73659 5.90163 6.66659 5.72913 6.66659C5.38413 6.66659 5.10413 6.94575 5.10413 7.29159C5.10413 7.46409 5.17413 7.61992 5.28746 7.73325L7.03246 9.47909H6.04163C5.69663 9.47909 5.41663 9.75825 5.41663 10.1041C5.41663 10.4491 5.69663 10.7291 6.04163 10.7291H8.54163C8.88663 10.7291 9.16663 10.4491 9.16663 10.1041V7.60408C9.16663 7.25825 8.88663 6.97909 8.54163 6.97909C8.19663 6.97909 7.91663 7.25825 7.91663 7.60408Z" fill="white"></path>
+      </svg>
+    </button>
+    <button id="fullscreen" aria-label="Fullscreen"><svg class="enter-fullscreen-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-enter-fullscreen="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 5L17.5858 5L14.2929 8.29292C13.9024 8.68345 13.9024 9.31661 14.2929 9.70714C14.6834 10.0977 15.3166 10.0977 15.7071 9.70714L19 6.41426V8C19 8.55228 19.4477 9 20 9C20.5523 9 21 8.55228 21 8V4C21 3.73478 20.8946 3.48043 20.7071 3.29289C20.5196 3.10536 20.2652 3 20 3H16C15.4477 3 15 3.44772 15 4C15 4.55228 15.4477 5 16 5ZM5 8.00002V6.4142L8.29292 9.70712C8.68345 10.0976 9.31661 10.0976 9.70714 9.70712C10.0977 9.3166 10.0977 8.68343 9.70714 8.29291L6.41424 5.00001L8 5.00002C8.55228 5.00002 9 4.5523 9 4.00002C9 3.44773 8.55228 3.00002 8 3.00002H4C3.73478 3.00002 3.48043 3.10537 3.29289 3.29291C3.10536 3.48044 3 3.7348 3 4.00002V8.00002C3 8.5523 3.44772 9.00001 4 9.00001C4.55228 9.00001 5 8.5523 5 8.00002ZM8.00002 19H6.4142L9.70712 15.7071C10.0976 15.3166 10.0976 14.6834 9.70712 14.2929C9.3166 13.9024 8.68343 13.9024 8.29291 14.2929L5.00001 17.5858V16C5.00001 15.4477 4.5523 15 4.00001 15C3.44773 15 3.00002 15.4477 3.00002 16L3.00002 20C3.00002 20.2652 3.10537 20.5196 3.29291 20.7071C3.48044 20.8947 3.7348 21 4.00002 21H8.00002C8.5523 21 9.00001 20.5523 9.00001 20C9.00001 19.4477 8.5523 19 8.00002 19ZM19 17.5858V16C19 15.4477 19.4477 15 20 15C20.5523 15 21 15.4477 21 16V20C21 20.2652 20.8946 20.5196 20.7071 20.7071C20.5196 20.8947 20.2652 21 20 21H16C15.4477 21 15 20.5523 15 20C15 19.4477 15.4477 19 16 19H17.5858L14.2929 15.7071C13.9023 15.3166 13.9023 14.6834 14.2929 14.2929C14.6834 13.9024 15.3166 13.9024 15.7071 14.2929L19 17.5858Z"></path></svg></button>
+    <a href="https://sponsorcast.vercel.app" target="_blank" class="sponsorcast-logo" aria-label="SponsorCast">
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" viewBox="0 0 500 127" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g><path style="opacity:1" fill="#fff" d="M 450.5,5.5 C 459.347,4.87387 468.014,5.70721 476.5,8C 481.979,10.4306 485.479,14.5973 487,20.5C 492.975,43.5358 494.642,66.8692 492,90.5C 490.881,95.2391 488.381,99.0724 484.5,102C 468.616,110.557 451.616,115.557 433.5,117C 397.938,121.035 362.272,122.368 326.5,121C 315.802,119.961 309.135,114.295 306.5,104C 303.669,82.5892 302.835,61.0892 304,39.5C 304.963,27.2079 311.463,20.0412 323.5,18C 330.473,16.8134 337.473,15.8134 344.5,15C 380.025,12.251 415.358,9.08434 450.5,5.5 Z"/></g>
+<g><path style="opacity:1" fill="#140a10" d="M 456.5,38.5 C 460.514,38.3345 464.514,38.5012 468.5,39C 469.337,40.0113 469.67,41.1779 469.5,42.5C 466.833,42.5 464.167,42.5 461.5,42.5C 462.631,53.1444 463.631,63.8111 464.5,74.5C 463.167,74.5 461.833,74.5 460.5,74.5C 459.167,64.505 457.834,54.505 456.5,44.5C 453.934,44.3444 451.434,44.6777 449,45.5C 446.035,44.2784 445.868,42.7784 448.5,41C 451.457,40.7206 454.123,39.8873 456.5,38.5 Z"/></g>
+<g><path style="opacity:1" fill="#10070d" d="M 430.5,41.5 C 436.104,40.8106 440.771,42.4773 444.5,46.5C 444.113,47.7199 443.28,48.3865 442,48.5C 438.311,46.7823 434.478,46.2823 430.5,47C 428.496,49.8408 427.996,53.0074 429,56.5C 432.411,57.2931 435.911,57.7931 439.5,58C 447.173,61.8408 448.507,67.3408 443.5,74.5C 438.731,78.6342 433.398,79.4675 427.5,77C 425.963,75.8904 425.297,74.3904 425.5,72.5C 429.819,73.2488 434.152,73.4155 438.5,73C 442.057,69.8185 442.391,66.3185 439.5,62.5C 435.555,61.7315 431.555,61.2315 427.5,61C 421.51,53.4225 422.51,46.9225 430.5,41.5 Z"/></g>
+<g><path style="opacity:1" fill="#170b12" d="M 404.5,45.5 C 408.689,45.1816 411.855,46.8482 414,50.5C 418.562,59.7369 420.729,69.4036 420.5,79.5C 419.349,80.731 418.183,80.731 417,79.5C 415.844,75.5817 415.344,71.5817 415.5,67.5C 411.76,67.2408 408.094,67.5741 404.5,68.5C 403.672,73.1315 403.172,77.7982 403,82.5C 401.667,83.8333 400.333,83.8333 399,82.5C 397.82,71.3252 398.486,60.3252 401,49.5C 402.032,47.9733 403.199,46.64 404.5,45.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 90.5,46.5 C 106.738,45.3998 115.071,53.0664 115.5,69.5C 115.446,78.2491 112.446,85.7491 106.5,92C 93.4596,99.8853 82.9596,97.3853 75,84.5C 70.2196,71.0566 73.0529,59.5566 83.5,50C 85.9252,48.7874 88.2585,47.6207 90.5,46.5 Z M 93.5,52.5 C 103.816,53.6534 109.149,59.4867 109.5,70C 109.146,77.0751 106.479,83.0751 101.5,88C 87.2132,92.8938 79.8799,87.7271 79.5,72.5C 79.233,62.1375 83.8997,55.4708 93.5,52.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 216.5,46.5 C 230.462,44.6304 238.629,50.6304 241,64.5C 242.62,75.6393 239.454,85.1393 231.5,93C 216.644,99.8225 206.144,95.6558 200,80.5C 196.767,64.6369 202.267,53.3036 216.5,46.5 Z M 219.5,52.5 C 230.294,52.9621 235.627,58.6287 235.5,69.5C 235.423,76.8171 232.757,82.9837 227.5,88C 213.571,92.5192 206.238,87.3525 205.5,72.5C 205.291,62.2043 209.958,55.5376 219.5,52.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 15.5,46.5 C 23.3707,45.6747 29.704,48.3414 34.5,54.5C 34.0142,56.4974 32.8475,57.8307 31,58.5C 27.6032,55.4763 23.6032,53.8096 19,53.5C 11.7254,54.9896 9.55876,59.323 12.5,66.5C 18.147,66.873 23.4803,68.373 28.5,71C 35.5185,79.2497 34.8519,86.9163 26.5,94C 20.2132,97.1555 13.8799,97.1555 7.5,94C 2.77347,91.6845 2.44014,89.1845 6.5,86.5C 11.5559,89.1173 16.8893,89.9506 22.5,89C 26.8541,85.2103 27.5207,80.877 24.5,76C 19.0961,74.99 13.7628,73.6566 8.5,72C 2.00734,60.9873 4.34067,52.4873 15.5,46.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 175.5,46.5 C 182.289,45.8183 188.122,47.8183 193,52.5C 193.923,55.2778 193.089,57.2778 190.5,58.5C 186.161,54.6571 181.161,53.1571 175.5,54C 172.581,55.8281 170.915,58.4947 170.5,62C 171.09,63.5095 171.756,65.0095 172.5,66.5C 179.007,66.6134 184.841,68.6134 190,72.5C 194.177,80.5821 193.011,87.7488 186.5,94C 179.391,97.2754 172.391,96.942 165.5,93C 163.771,91.2111 163.104,89.0444 163.5,86.5C 167.049,86.4392 170.382,87.2725 173.5,89C 184.539,90.6381 188.206,86.3048 184.5,76C 179.894,74.8387 175.227,73.8387 170.5,73C 167.572,71.7402 165.739,69.5735 165,66.5C 163.186,56.864 166.686,50.1973 175.5,46.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 257.5,46.5 C 268.47,45.4698 275.47,50.1365 278.5,60.5C 277.576,67.0171 274.576,72.3504 269.5,76.5C 272.597,82.3689 275.93,88.0356 279.5,93.5C 278.904,96.2464 277.237,97.0798 274.5,96C 272.667,94.8333 271.167,93.3333 270,91.5C 268.388,85.2536 265.054,80.2536 260,76.5C 258.644,77.3802 257.144,77.7135 255.5,77.5C 255.666,83.8421 255.5,90.1754 255,96.5C 253.556,98.1554 251.722,98.822 249.5,98.5C 248.665,84.3495 248.499,70.0162 249,55.5C 250.688,51.3148 253.521,48.3148 257.5,46.5 Z M 258.5,52.5 C 268.646,51.2933 272.813,55.6266 271,65.5C 269.773,67.7261 267.939,69.2261 265.5,70C 262.242,70.2117 259.076,70.7117 256,71.5C 254.582,66.5715 254.249,61.5715 255,56.5C 255.69,54.6498 256.856,53.3164 258.5,52.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 43.5,47.5 C 61.984,46.1442 69.8173,54.4776 67,72.5C 62.086,78.6506 55.586,81.6506 47.5,81.5C 47.8161,85.5246 47.9828,89.5246 48,93.5C 46,97.5 44,97.5 42,93.5C 41.3333,78.8333 41.3333,64.1667 42,49.5C 42.7172,48.9558 43.2172,48.2891 43.5,47.5 Z M 47.5,54.5 C 58.7585,53.7479 63.0918,58.7479 60.5,69.5C 56.8268,72.7743 52.4934,74.441 47.5,74.5C 47.5,67.8333 47.5,61.1667 47.5,54.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 152.5,47.5 C 154.017,47.5106 155.184,48.1772 156,49.5C 156.915,64.2234 156.415,78.89 154.5,93.5C 151.755,94.9753 149.588,94.3087 148,91.5C 141.501,82.5064 135.501,73.1731 130,63.5C 129.667,73.8333 129.333,84.1667 129,94.5C 126.733,95.9348 124.733,95.6015 123,93.5C 122.833,86.8333 122.667,80.1667 122.5,73.5C 122.384,65.7594 122.884,58.0927 124,50.5C 126.632,47.8076 128.966,48.141 131,51.5C 137.503,61.1685 143.503,71.1685 149,81.5C 149.333,71.1667 149.667,60.8333 150,50.5C 150.698,49.3094 151.531,48.3094 152.5,47.5 Z"/></g>
+<g><path style="opacity:1" fill="#11070d" d="M 376.5,49.5 C 383.486,47.8285 388.486,50.1619 391.5,56.5C 391.113,57.7199 390.28,58.3865 389,58.5C 386.277,56.3061 383.277,54.6394 380,53.5C 377.497,53.99 375.497,55.3234 374,57.5C 371.607,64.1818 372.274,70.5151 376,76.5C 382.352,82.3717 387.185,81.205 390.5,73C 391.448,72.5172 392.448,72.3505 393.5,72.5C 392.319,83.0956 386.652,86.5956 376.5,83C 366.669,74.4998 365.002,64.6665 371.5,53.5C 373.21,52.1128 374.877,50.7794 376.5,49.5 Z"/></g>
+<g><path style="opacity:1" fill="#fff" d="M 407.5,63.5 C 406.167,63.5 404.833,63.5 403.5,63.5C 403.5,61.1667 403.5,58.8333 403.5,56.5C 405.802,48.6171 408.635,48.6171 412,56.5C 412.813,58.4357 413.313,60.4357 413.5,62.5C 411.5,62.8333 409.5,63.1667 407.5,63.5 Z"/></g>
+<g><path style="opacity:1" fill="#040203" d="M 337.5,55.5 C 344.429,55.051 349.262,58.051 352,64.5C 354.772,81.0538 347.939,88.5538 331.5,87C 329.376,85.8783 327.543,84.3783 326,82.5C 321.71,69.7689 325.543,60.7689 337.5,55.5 Z"/></g>
+<g><path style="opacity:1" fill="#5c2649" d="M 403.5,56.5 C 403.5,58.8333 403.5,61.1667 403.5,63.5C 404.833,63.5 406.167,63.5 407.5,63.5C 406.081,64.4511 404.415,64.7845 402.5,64.5C 402.194,61.6146 402.527,58.9479 403.5,56.5 Z"/></g>
+</svg>
+
+  </a>
+  </div>
+  
+`;
+
+        wrapper.prepend(video);
         container.innerHTML = '';
-        container.appendChild(video);
+        container.appendChild(wrapper);
+
+        // Obtén las referencias a los nuevos elementos
+        const progressContainer = wrapper.querySelector('.progress-container');
+        const progressBar = wrapper.querySelector('.progress-bar');
+        const bufferedBar = wrapper.querySelector('.buffered-bar');
+        const progressInput = wrapper.querySelector('#progress');
+        const timecodeContainer = wrapper.querySelector('.timecode-container');
+        const timecode = wrapper.querySelector('.timecode');
+        const hoverTimecode = wrapper.querySelector('.hover-timecode');
+        const currentTimecode = wrapper.querySelector('.current-timecode');
+        const hoverTimecodeText = hoverTimecode.querySelector('.timecode');
+        const currentTimecodeText = currentTimecode.querySelector('.timecode-current');
+        const volumeBtn = wrapper.querySelector('#volume-btn');
+        const volumeSlider = wrapper.querySelector('#volume');
+        const volumeIcon = wrapper.querySelector('.volume-icon');
+
+
+
+        // Estado para controlar el tooltip
+        let isHoveringProgress = false;
+        let currentTooltipTime = 0;
+
+        // Configura el volumen inicial
+        video.volume = volumeSlider.value;
+
+        // Actualiza el icono según el volumen
+        function updateVolumeIcon() {
+            if (video.muted || video.volume === 0) {
+                volumeIcon.innerHTML = `<path fill-rule="evenodd" clip-rule="evenodd" d="M14 2.20001C15.1263 2.42863 16.1838 2.84654 17.1379 3.41908L15.5513 4.82943C15.0606 4.58595 14.5414 4.39136 14 4.25201V2.20001ZM21.1249 7.90287L19.5378 9.31361C19.8371 10.1532 20 11.0576 20 12C20 15.7277 17.4505 18.8599 14 19.7479V21.7999C18.5645 20.8734 22 16.8379 22 12C22 10.5401 21.6872 9.15325 21.1249 7.90287ZM12 4.00396V7.98614L3.17811 15.8278C2.48346 15.5143 2 14.8156 2 14.004V10.004C2 8.89939 2.89543 8.00396 4 8.00396H6.58579L10.2929 3.29685C10.9229 2.66689 12 3.11305 12 4.00396ZM12 10.662L5.99037 16.004L2.33565 19.2526C1.92286 19.6195 1.88568 20.2516 2.2526 20.6644C2.61952 21.0772 3.25159 21.1143 3.66437 20.7474L21.6644 4.74742C22.0772 4.3805 22.1143 3.74843 21.7474 3.33565C21.3805 2.92286 20.7484 2.88568 20.3356 3.2526L12 10.662ZM10.2929 20.7111L8.81985 18.8407L12 16.0139V20.004C12 20.8949 10.9229 21.341 10.2929 20.7111ZM14 15.4648C15.0633 14.8498 15.8172 13.7593 15.971 12.4841L17.8778 10.7892C17.9579 11.1803 18 11.5852 18 12C18 14.6124 16.3304 16.8349 14 17.6586V15.4648Z"></path>`;
+            } else if (video.volume < 0.5) {
+                volumeIcon.innerHTML = `<path fill-rule="evenodd" clip-rule="evenodd" d="M18 12C18 9.38754 16.3304 7.16506 14 6.34139V8.53511C15.1956 9.22672 16 10.5194 16 12C16 13.4805 15.1956 14.7732 14 15.4648V17.6586C16.3304 16.8349 18 14.6124 18 12ZM6.58579 8.00396H4C2.89543 8.00396 2 8.89939 2 10.004V14.004C2 15.1085 2.89543 16.004 4 16.004H6.58579L10.2929 20.7111C10.9229 21.341 12 20.8949 12 20.004V4.00396C12 3.11305 10.9229 2.66689 10.2929 3.29685L6.58579 8.00396Z"></path>`;
+            } else {
+                volumeIcon.innerHTML = `<path fill-rule="evenodd" clip-rule="evenodd" d="M20 12C20 15.7277 17.4505 18.8599 14 19.7479V21.7999C18.5645 20.8734 22 16.8379 22 12C22 7.16206 18.5645 3.12655 14 2.20001V4.25201C17.4505 5.1401 20 8.2723 20 12ZM18 12C18 9.38754 16.3304 7.16506 14 6.34139V8.53511C15.1956 9.22672 16 10.5194 16 12C16 13.4805 15.1956 14.7732 14 15.4648V17.6586C16.3304 16.8349 18 14.6124 18 12ZM6.58579 8.00396H4C2.89543 8.00396 2 8.89939 2 10.004V14.004C2 15.1085 2.89543 16.004 4 16.004H6.58579L10.2929 20.7111C10.9229 21.341 12 20.8949 12 20.004V4.00396C12 3.11305 10.9229 2.66689 10.2929 3.29685L6.58579 8.00396Z"></path>`;
+            }
+        }
+
+        // Actualiza el icono al cargar
+        updateVolumeIcon();
+
+        // Control de volumen
+        volumeSlider.addEventListener('input', () => {
+            video.volume = volumeSlider.value;
+            video.muted = false;
+            updateVolumeIcon();
+        });
+
+        // Silenciar al hacer clic en el botón
+        volumeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            video.muted = !video.muted;
+            if (!video.muted && video.volume === 0) {
+                video.volume = 0.5;
+                volumeSlider.value = 0.5;
+            }
+            updateVolumeIcon();
+        });
+
+        // Actualizar el slider cuando cambia el volumen
+        video.addEventListener('volumechange', () => {
+            if (!video.muted) {
+                volumeSlider.value = video.volume;
+            }
+            updateVolumeIcon();
+        });
+
+        // Función para actualizar la posición del tooltip
+        function updateTooltipPosition(percent, time) {
+            const containerWidth = progressContainer.offsetWidth;
+            const tooltipWidth = 60; // Ancho aproximado del tooltip
+
+            let leftPosition = percent;
+
+            // Prevenir que el tooltip se salga de los bordes
+            if (leftPosition < 5) leftPosition = 5;
+            if (leftPosition > 95) leftPosition = 95;
+
+            timecodeContainer.style.left = `${leftPosition}%`;
+            timecode.textContent = this.formatTime(time);
+        }
+        // Mostrar tooltip durante la reproducción normal
+        video.addEventListener('timeupdate', () => {
+            if (!video.duration) return;
+
+            const percent = (video.currentTime / video.duration) * 100;
+            progressBar.style.width = `${percent}%`;
+            progressInput.value = percent;
+
+            // Actualizar buffer
+            if (video.buffered.length > 0) {
+                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                const bufferedPercent = (bufferedEnd / video.duration) * 100;
+                bufferedBar.style.width = `${bufferedPercent}%`;
+            }
+
+            // Actualizar tooltip del tiempo actual
+            currentTimecodeText.textContent = this.formatTime(video.currentTime);
+            currentTimecode.style.left = `${percent}%`;
+        });
+
+        // Tooltip de preview (al pasar el mouse)
+        progressContainer.addEventListener('mouseenter', () => {
+            isHoveringProgress = true;
+            timecodeContainer.style.opacity = '1';
+        });
+
+        progressContainer.addEventListener('mousemove', (e) => {
+            if (!video.duration) return;
+
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            const time = pos * video.duration;
+
+            timecode.textContent = this.formatTime(time);
+            timecodeContainer.style.left = `${pos * 100}%`;
+        });
+
+        progressContainer.addEventListener('mouseleave', () => {
+            isHoveringProgress = false;
+            timecodeContainer.style.opacity = '0';
+        });
+
+        // Al hacer clic en la barra
+        progressContainer.addEventListener('click', (e) => {
+            if (!video.duration) return;
+
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            const time = pos * video.duration;
+            video.currentTime = time;
+
+            // Actualizar tooltip después del salto
+            timecode.textContent = this.formatTime(time);
+            timecodeContainer.style.left = `${pos * 100}%`;
+        });
+
+        // Mostrar/ocultar controles al interactuar con el video
+        wrapper.addEventListener('mouseenter', () => {
+            wrapper.querySelector('.controls').style.opacity = '1';
+        });
+
+        wrapper.addEventListener('mouseleave', () => {
+            wrapper.querySelector('.controls').style.opacity = '0';
+            if (!isHoveringProgress) {
+                timecodeContainer.style.opacity = '0';
+            }
+        });
+
+        // Controles personalizados
+        const playBtn = wrapper.querySelector('#play');
+        const progress = wrapper.querySelector('#progress');
+        const volume = wrapper.querySelector('#volume');
+        const fullscreenBtn = wrapper.querySelector('#fullscreen');
+        const pipBtn = wrapper.querySelector('#pip');
+
+        // Verificar si el navegador soporta Picture-in-Picture
+        if ('pictureInPictureEnabled' in document) {
+            pipBtn.style.display = 'block';
+
+            pipBtn.addEventListener('click', async () => {
+                try {
+                    if (video !== document.pictureInPictureElement) {
+                        await video.requestPictureInPicture();
+                        pipBtn.innerHTML = `
+                            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-exit-pip="true">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M4 6H20V12H22V6C22 4.89543 21.1046 4 20 4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H10V16H4V6ZM12 15C12 14.4477 12.4477 14 13 14H21C21.5523 14 22 14.4477 22 15V21C22 21.5523 21.5523 22 21 22H13C12.4477 22 12 21.5523 12 21V15ZM7.625 11.75V10.561L9.72 12.656C9.855 12.791 10.043 12.875 10.25 12.875C10.664 12.875 11 12.54 11 12.125C11 11.918 10.916 11.731 10.78 11.595L8.686 9.5H9.875C10.289 9.5 10.625 9.165 10.625 8.75C10.625 8.336 10.289 8 9.875 8L6.875 8C6.461 8 6.125 8.336 6.125 8.75V11.75C6.125 12.165 6.461 12.5 6.875 12.5C7.289 12.5 7.625 12.165 7.625 11.75Z" fill="white"></path>
+                            </svg>
+                        `;
+                    } else {
+                        await document.exitPictureInPicture();
+                        pipBtn.innerHTML = `
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" data-enter-pip="true">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.33329 4.99992H16.6666V9.99992H18.3333V4.99992C18.3333 4.07944 17.5871 3.33325 16.6666 3.33325H3.33329C2.41282 3.33325 1.66663 4.07944 1.66663 4.99992V13.3333C1.66663 14.2537 2.41282 14.9999 3.33329 14.9999H8.33329V13.3333H3.33329V4.99992ZM9.99996 12.6666C9.99996 12.1143 10.4477 11.6666 11 11.6666H17.3333C17.8856 11.6666 18.3333 12.1143 18.3333 12.6666V17.3333C18.3333 17.8855 17.8856 18.3333 17.3333 18.3333H11C10.4477 18.3333 9.99996 17.8855 9.99996 17.3333V12.6666ZM7.91663 7.60408V8.59492L6.17079 6.84909C6.05829 6.73659 5.90163 6.66659 5.72913 6.66659C5.38413 6.66659 5.10413 6.94575 5.10413 7.29159C5.10413 7.46409 5.17413 7.61992 5.28746 7.73325L7.03246 9.47909H6.04163C5.69663 9.47909 5.41663 9.75825 5.41663 10.1041C5.41663 10.4491 5.69663 10.7291 6.04163 10.7291H8.54163C8.88663 10.7291 9.16663 10.4491 9.16663 10.1041V7.60408C9.16663 7.25825 8.88663 6.97909 8.54163 6.97909C8.19663 6.97909 7.91663 7.25825 7.91663 7.60408Z" fill="white"></path>
+                            </svg>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('Error al manejar Picture-in-Picture:', error);
+                }
+            });
+
+            // Escuchar cambios en el estado de Picture-in-Picture
+            video.addEventListener('enterpictureinpicture', () => {
+                pipBtn.innerHTML = `
+                    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-exit-pip="true">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M4 6H20V12H22V6C22 4.89543 21.1046 4 20 4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H10V16H4V6ZM12 15C12 14.4477 12.4477 14 13 14H21C21.5523 14 22 14.4477 22 15V21C22 21.5523 21.5523 22 21 22H13C12.4477 22 12 21.5523 12 21V15ZM7.625 11.75V10.561L9.72 12.656C9.855 12.791 10.043 12.875 10.25 12.875C10.664 12.875 11 12.54 11 12.125C11 11.918 10.916 11.731 10.78 11.595L8.686 9.5H9.875C10.289 9.5 10.625 9.165 10.625 8.75C10.625 8.336 10.289 8 9.875 8L6.875 8C6.461 8 6.125 8.336 6.125 8.75V11.75C6.125 12.165 6.461 12.5 6.875 12.5C7.289 12.5 7.625 12.165 7.625 11.75Z" fill="white"></path>
+                    </svg>
+                `;
+            });
+
+            video.addEventListener('leavepictureinpicture', () => {
+                pipBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" data-enter-pip="true">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M3.33329 4.99992H16.6666V9.99992H18.3333V4.99992C18.3333 4.07944 17.5871 3.33325 16.6666 3.33325H3.33329C2.41282 3.33325 1.66663 4.07944 1.66663 4.99992V13.3333C1.66663 14.2537 2.41282 14.9999 3.33329 14.9999H8.33329V13.3333H3.33329V4.99992ZM9.99996 12.6666C9.99996 12.1143 10.4477 11.6666 11 11.6666H17.3333C17.8856 11.6666 18.3333 12.1143 18.3333 12.6666V17.3333C18.3333 17.8855 17.8856 18.3333 17.3333 18.3333H11C10.4477 18.3333 9.99996 17.8855 9.99996 17.3333V12.6666ZM7.91663 7.60408V8.59492L6.17079 6.84909C6.05829 6.73659 5.90163 6.66659 5.72913 6.66659C5.38413 6.66659 5.10413 6.94575 5.10413 7.29159C5.10413 7.46409 5.17413 7.61992 5.28746 7.73325L7.03246 9.47909H6.04163C5.69663 9.47909 5.41663 9.75825 5.41663 10.1041C5.41663 10.4491 5.69663 10.7291 6.04163 10.7291H8.54163C8.88663 10.7291 9.16663 10.4491 9.16663 10.1041V7.60408C9.16663 7.25825 8.88663 6.97909 8.54163 6.97909C8.19663 6.97909 7.91663 7.25825 7.91663 7.60408Z" fill="white"></path>
+                    </svg>
+                `;
+            });
+        } else {
+            // Ocultar el botón si no es compatible
+            pipBtn.style.display = 'none';
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+                playBtn.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-pause-icon="true" class="pauseIcon">
+        <path fill-rule="evenodd" clip-rule="evenodd" class="fill" d="M8 4C6.89543 4 6 4.89543 6 6V18C6 19.1046 6.89543 20 8 20C9.10457 20 10 19.1046 10 18V6C10 4.89543 9.10457 4 8 4ZM16 4C14.8954 4 14 4.89543 14 6V18C14 19.1046 14.8954 20 16 20C17.1046 20 18 19.1046 18 18V6C18 4.89543 17.1046 4 16 4Z"></path>
+      </svg>`;
+            } else {
+                video.pause();
+                playBtn.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-play-icon="true" class="playIcon">
+        <path d="M19 12C19 12.3557 18.8111 12.6846 18.5039 12.8638L6.50387 19.8638C6.19458 20.0442 5.81243 20.0455 5.50194 19.8671C5.19145 19.6888 5 19.3581 5 19L5 5C5 4.64193 5.19145 4.3112 5.50194 4.13286C5.81243 3.95452 6.19458 3.9558 6.50387 4.13622L18.5039 11.1362C18.8111 11.3154 19 11.6443 19 12Z" class="fill"></path>
+      </svg>`;
+            }
+        });
+
+        volume.addEventListener('input', () => {
+            video.volume = volume.value;
+        });
+
+        video.addEventListener('timeupdate', () => {
+            progress.value = (video.currentTime / video.duration) * 100;
+        });
+
+        progress.addEventListener('input', () => {
+            video.currentTime = (progress.value / 100) * video.duration;
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen();
+                fullscreenBtn.innerHTML = `
+      <svg class="exit-fullscreen-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-exit-fullscreen="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.41425 7.00003L8.41425 4.41425L10.4142 4.41425L10.4142 9.41425C10.4142 9.67946 10.3089 9.93382 10.1214 10.1214C9.93382 10.3089 9.67946 10.4142 9.41425 10.4142L4.41425 10.4142L4.41425 8.41425L7.00003 8.41425L3 4.41422L4.41422 3L8.41425 7.00003Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M17.0097 8.41425L21 4.42398L19.5858 3.00977L15.5858 7.0098L15.5858 4.42401L13.5858 4.42401L13.5858 9.41424C13.5858 9.67946 13.6911 9.93382 13.8787 10.1214C14.0662 10.3089 14.3205 10.4142 14.5858 10.4142L19.5858 10.4142L19.5858 8.41425L17.0097 8.41425Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M8.41419 17L4.41421 21L3 19.5858L6.99997 15.5858L4.41419 15.5858L4.41419 13.5858L9.41419 13.5858C9.96647 13.5858 10.4142 14.0335 10.4142 14.5858L10.4142 19.5858L8.41419 19.5858L8.41419 17Z"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5858 16.9986L19.5855 21L21 19.5861L17.0015 15.5858L19.5813 15.5858L19.5813 13.5858L14.5858 13.5858C14.3206 13.5858 14.0662 13.6912 13.8787 13.8787C13.6912 14.0662 13.5858 14.3206 13.5858 14.5858L13.5858 19.5858L15.5858 19.5858L15.5858 16.9986Z"></path></svg>`;
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.innerHTML = `
+      <svg class="enter-fullscreen-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-enter-fullscreen="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M16 5L17.5858 5L14.2929 8.29292C13.9024 8.68345 13.9024 9.31661 14.2929 9.70714C14.6834 10.0977 15.3166 10.0977 15.7071 9.70714L19 6.41426V8C19 8.55228 19.4477 9 20 9C20.5523 9 21 8.55228 21 8V4C21 3.73478 20.8946 3.48043 20.7071 3.29289C20.5196 3.10536 20.2652 3 20 3H16C15.4477 3 15 3.44772 15 4C15 4.55228 15.4477 5 16 5ZM5 8.00002V6.4142L8.29292 9.70712C8.68345 10.0976 9.31661 10.0976 9.70714 9.70712C10.0977 9.3166 10.0977 8.68343 9.70714 8.29291L6.41424 5.00001L8 5.00002C8.55228 5.00002 9 4.5523 9 4.00002C9 3.44773 8.55228 3.00002 8 3.00002H4C3.73478 3.00002 3.48043 3.10537 3.29289 3.29291C3.10536 3.48044 3 3.7348 3 4.00002V8.00002C3 8.5523 3.44772 9.00001 4 9.00001C4.55228 9.00001 5 8.5523 5 8.00002ZM8.00002 19H6.4142L9.70712 15.7071C10.0976 15.3166 10.0976 14.6834 9.70712 14.2929C9.3166 13.9024 8.68343 13.9024 8.29291 14.2929L5.00001 17.5858V16C5.00001 15.4477 4.5523 15 4.00001 15C3.44773 15 3.00002 15.4477 3.00002 16L3.00002 20C3.00002 20.2652 3.10537 20.5196 3.29291 20.7071C3.48044 20.8947 3.7348 21 4.00002 21H8.00002C8.5523 21 9.00001 20.5523 9.00001 20C9.00001 19.4477 8.5523 19 8.00002 19ZM19 17.5858V16C19 15.4477 19.4477 15 20 15C20.5523 15 21 15.4477 21 16V20C21 20.2652 20.8946 20.5196 20.7071 20.7071C20.5196 20.8947 20.2652 21 20 21H16C15.4477 21 15 20.5523 15 20C15 19.4477 15.4477 19 16 19H17.5858L14.2929 15.7071C13.9023 15.3166 13.9023 14.6834 14.2929 14.2929C14.6834 13.9024 15.3166 13.9024 15.7071 14.2929L19 17.5858Z"></path></svg>`;
+            }
+        });
+
+        // Atajos de teclado tipo YouTube
+        wrapper.addEventListener('keydown', e => {
+            switch (e.key) {
+                case 'k':
+                case ' ':
+                    e.preventDefault();
+                    playBtn.click();
+                    break;
+                case 'f':
+                    fullscreenBtn.click();
+                    break;
+                case 'm':
+                    video.muted = !video.muted;
+                    e.preventDefault();
+                    volumeBtn.click();
+                    break;
+                case 'ArrowRight':
+                    video.currentTime += 5;
+                    break;
+                case 'ArrowLeft':
+                    video.currentTime -= 5;
+                    break;
+            }
+        });
     }
+
 
     showError(message) {
         this.shadowRoot.innerHTML = `
