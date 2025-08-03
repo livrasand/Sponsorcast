@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Sponsors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            background: linear-gradient(135deg, #e8f5ff 0%, #f0e6ff 25%, #ffe6f0 50%, #e6f7ff 75%, #f0fff0 100%);
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .header {
+            position: absolute;
+            top: 40px;
+            color: #6b7280;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .main-content {
+            text-align: center;
+            z-index: 10;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .main-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            color: #1f2937;
+            line-height: 1.1;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Floating elements */
+        .floating-element {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .heart {
+            width: 30px;
+            height: 30px;
+            background: #ff69b4;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            width: 20px;
+            height: 32px;
+            position: absolute;
+            left: 15px;
+            top: 0;
+            background: #ff69b4;
+            border-radius: 20px 20px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        .big-heart {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50%;
+            position: absolute;
+            right: 150px;
+            top: 200px;
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.3);
+        }
+
+        .big-heart::before,
+        .big-heart::after {
+            content: '';
+            width: 50px;
+            height: 80px;
+            position: absolute;
+            left: 40px;
+            top: 0;
+            background: linear-gradient(45deg, #ff1493, #ff69b4);
+            border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .big-heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        /* Character/mascot */
+        .character {
+            position: absolute;
+            right: 100px;
+            bottom: 100px;
+            width: 120px;
+            height: 180px;
+            z-index: 5;
+        }
+
+        .character-body {
+            width: 80px;
+            height: 100px;
+            background: #2d3748;
+            border-radius: 40px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .character-head {
+            width: 60px;
+            height: 60px;
+            background: #f7fafc;
+            border-radius: 50%;
+            position: absolute;
+            top: -30px;
+            left: 10px;
+            border: 3px solid #2d3748;
+        }
+
+        .character-arm {
+            width: 20px;
+            height: 60px;
+            background: #2d3748;
+            border-radius: 10px;
+            position: absolute;
+            top: 20px;
+            right: -25px;
+            transform: rotate(45deg);
+        }
+
+        /* Buildings */
+        .building {
+            position: absolute;
+            bottom: 0;
+        }
+
+        .building-1 {
+            left: 50px;
+            width: 100px;
+            height: 200px;
+            background: linear-gradient(45deg, #a78bfa, #c084fc);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .building-2 {
+            left: 180px;
+            width: 80px;
+            height: 150px;
+            background: linear-gradient(45deg, #60a5fa, #93c5fd);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .building-3 {
+            left: 280px;
+            width: 120px;
+            height: 180px;
+            background: linear-gradient(45deg, #34d399, #6ee7b7);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .building-4 {
+            left: 420px;
+            width: 90px;
+            height: 160px;
+            background: linear-gradient(45deg, #fbbf24, #fcd34d);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .building-5 {
+            left: 530px;
+            width: 110px;
+            height: 190px;
+            background: linear-gradient(45deg, #f87171, #fca5a5);
+            border-radius: 10px 10px 0 0;
+        }
+
+        /* Windows */
+        .building::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 15px;
+            width: calc(100% - 30px);
+            height: calc(100% - 40px);
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                transparent 15px,
+                rgba(255,255,255,0.3) 15px,
+                rgba(255,255,255,0.3) 17px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                transparent 15px,
+                rgba(255,255,255,0.3) 15px,
+                rgba(255,255,255,0.3) 17px
+            );
+        }
+
+        /* Clouds */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            animation: drift 20s linear infinite;
+        }
+
+        .cloud-1 {
+            width: 100px;
+            height: 40px;
+            top: 100px;
+            left: -100px;
+        }
+
+        .cloud-2 {
+            width: 80px;
+            height: 30px;
+            top: 150px;
+            left: -80px;
+            animation-delay: -10s;
+        }
+
+        .cloud-3 {
+            width: 120px;
+            height: 50px;
+            top: 80px;
+            right: -120px;
+            animation: drift-reverse 25s linear infinite;
+        }
+
+        /* Floating people with hearts */
+        .floating-person {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+        }
+
+        .person-1 {
+            top: 120px;
+            left: 200px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .person-2 {
+            top: 180px;
+            left: 300px;
+            animation: float 5s ease-in-out infinite 1s;
+        }
+
+        .person-3 {
+            top: 100px;
+            right: 300px;
+            animation: float 4.5s ease-in-out infinite 2s;
+        }
+
+        .floating-person::before {
+            content: '♥';
+            position: absolute;
+            color: #ff69b4;
+            font-size: 20px;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        .floating-person::after {
+            content: '';
+            width: 20px;
+            height: 30px;
+            background: #6b7280;
+            border-radius: 10px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 120px)); }
+        }
+
+        @keyframes drift-reverse {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-100vw - 120px)); }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .building {
+                transform: scale(0.7);
+            }
+            
+            .character {
+                right: 20px;
+                bottom: 50px;
+                transform: scale(0.8);
+            }
+            
+            .big-heart {
+                right: 50px;
+                top: 150px;
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">GitHub Sponsors</div>
+        
+        <div class="main-content">
+            <h1 class="main-title">Invest in the software that powers your world</h1>
+        </div>
+
+        
+
+        <!-- Big heart balloon -->
+        <div class="big-heart floating-element"></div>
+
+        
+    </div>
+</body>
+</html>

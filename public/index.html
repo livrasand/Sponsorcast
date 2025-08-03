@@ -6,25 +6,30 @@
     <title>Sponsorcast - Screencasts for GitHub Sponsors</title>
     <link rel="icon" type="image/png" href="images/sponsorcastIconSquare.png">
     <style>
+        :root {
+  --footer-bg-color: #161b22;
+  --footer-text-color: #7d8590;
+  --footer-link-color: #c9d1d9;
+  --footer-border-color: #30363d;
+  --footer-button-bg: #f0f6fc;
+  --footer-button-text: #24292f;
+}
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+
         body {
             font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #fafafa;
+            background: #fff;
             color: #171717;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
+            box-shadow: inset 0 4px 50px -10px rgba(0, 0, 0, 0.1);
         }
 
         /* Header */
@@ -32,7 +37,7 @@
             padding: 40px 0 40px;
             text-align: center;
             border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 80px;
+            margin: 0 24px;
         }
 
         .logo {
@@ -53,8 +58,10 @@
 
         /* Hero Section */
         .hero {
-            text-align: center;
+            text-align: left;
             margin-bottom: 120px;
+            background: #f1f8ff;
+            padding: 64px;
         }
 
         .hero-title {
@@ -72,7 +79,6 @@
         .hero-description {
             font-size: 24px;
             color: #525252;
-            max-width: 800px;
             margin: 0 auto 48px;
             font-weight: 400;
         }
@@ -101,24 +107,28 @@
         /* Features Grid */
         .features {
             margin-bottom: 120px;
+            padding: 48px;
         }
 
         .section-title {
-            font-size: 36px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 16px;
-            letter-spacing: -0.025em;
+            font-size: 2rem;
+            text-align: left;
+            letter-spacing: -0.02em;
+            color: #24292f;
+            line-height: 1.2;
+            font-style: normal;
+            font-weight: 600;
+            margin-bottom: 4rem;
         }
 
         .section-subtitle {
-            font-size: 18px;
-            color: #737373;
-            text-align: center;
-            margin-bottom: 64px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            color: #57606a;
+            font-size: 2rem;
+            text-align: left;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            font-style: normal;
+            font-weight: 600;
         }
 
         .features-grid {
@@ -128,32 +138,33 @@
         }
 
         .feature-card {
-            background: white;
+            background: #f6f8fa;
+            border-radius: 1rem;
+            height: 100%;
             padding: 32px;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
             transition: all 0.2s ease;
-        }
-
-        .feature-card:hover {
-            border-color: #d1d5db;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         .feature-icon {
             font-size: 24px;
-            margin-bottom: 16px;
+            margin-bottom: 1.5rem;
         }
 
         .feature-title {
-            font-size: 20px;
+            font-size: 1.125rem;
             font-weight: 600;
-            margin-bottom: 12px;
+            line-height: 1.3;
+            color: #24292f;
+            --condensed-stretch: 75%;
+            margin-bottom: 1rem;
         }
 
         .feature-description {
-            color: #525252;
-            font-size: 16px;
+            color: #57606a;
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 400;
+            letter-spacing: 0rem;
         }
 
         /* Code Section */
@@ -163,6 +174,7 @@
             border-radius: 12px;
             padding: 48px;
             margin-bottom: 120px;
+            margin: 48px;
         }
 
         .code-title {
@@ -206,6 +218,7 @@
             border-radius: 12px;
             padding: 48px;
             margin-bottom: 120px;
+            margin: 48px;
         }
 
         .demo-title {
@@ -241,6 +254,7 @@
             border-radius: 12px;
             padding: 48px;
             margin-bottom: 80px;
+            margin: 48px;
         }
 
         .setup-title {
@@ -440,14 +454,290 @@
     border-color: #262626;
 }
 
+/* Estilos generales y de la sección principal */
+.maintainers-section {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding: 80px 40px;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* Contenido de texto a la izquierda */
+.text-content {
+  max-width: 400px;
+  flex-shrink: 0;
+}
+
+.text-content h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #24292f;
+  margin-bottom: 16px;
+}
+
+.text-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #57606a;
+  margin-bottom: 24px;
+}
+
+.text-content a {
+  font-size: 1.1rem;
+  color: #0969da;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.text-content a:hover {
+  text-decoration: underline;
+}
+
+/* Contenedor de la cuadrícula de imágenes a la derecha */
+.image-grid-container {
+  position: relative;
+  width: 550px;
+  height: 400px;
+}
+
+/* Efecto de brillo de fondo */
+.background-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(
+      circle at 20% 25%,
+      rgba(255, 182, 193, 0.4) 0%,
+      rgba(255, 182, 193, 0) 40%
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(173, 216, 230, 0.4) 0%,
+      rgba(173, 216, 230, 0) 40%
+    ),
+    radial-gradient(
+      circle at 50% 80%,
+      rgba(255, 228, 181, 0.4) 0%,
+      rgba(255, 228, 181, 0) 40%
+    );
+  filter: blur(30px);
+  z-index: 1;
+}
+
+/* Estilo base de las tarjetas de patrocinador */
+.sponsor-card {
+  background-color: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: absolute;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.sponsor-card:hover {
+  transform: scale(1.05) !important;
+  z-index: 10;
+}
+
+.sponsor-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.sponsor-card button {
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+  color: #24292f;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sponsor-card button:hover {
+  background-color: #f0f2f5;
+}
+
+/* Posicionamiento y rotación de cada tarjeta */
+.card-1 {
+  top: 20px;
+  left: 120px;
+  transform: rotate(-8deg);
+}
+.card-2 {
+  top: 50px;
+  left: 280px;
+  transform: rotate(5deg);
+}
+.card-3 {
+  top: 25px;
+  right: 50px;
+  transform: rotate(10deg);
+}
+.card-4 {
+  top: 160px;
+  left: 160px;
+  transform: rotate(8deg);
+}
+.card-5 {
+  top: 150px;
+  right: 10px;
+  transform: rotate(-10deg);
+}
+.card-6 {
+  bottom: 60px;
+  right: 150px;
+  transform: rotate(12deg);
+}
+.card-7 {
+  bottom: 50px;
+  left: 200px;
+  transform: rotate(-5deg);
+}
+
+/* --- Estructura Principal del Footer --- */
+.site-footer {
+  background-color: var(--footer-bg-color);
+  color: var(--footer-text-color);
+  font-family: 'SF Mono', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 40px 0;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+/* --- Lado Izquierdo: Formulario de Suscripción --- */
+.footer-left {
+  flex-basis: 40%;
+}
+
+.signup-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--footer-link-color);
+  margin: 0 0 16px 0;
+}
+
+.signup-form {
+  display: flex;
+}
+
+.signup-form input {
+  background-color: transparent;
+  border: 1px solid var(--footer-border-color);
+  color: var(--footer-text-color);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  min-width: 250px;
+  border-radius: 6px 0 0 6px;
+}
+
+.signup-form input::placeholder {
+  color: var(--footer-text-color);
+  opacity: 1;
+}
+
+.signup-form button {
+  background-color: var(--footer-button-bg);
+  color: var(--footer-button-text);
+  border: 1px solid var(--footer-border-color);
+  border-left: 0;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 0 6px 6px 0;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.signup-form button:hover {
+  background-color: #e1e9f3;
+}
+
+/* --- Lado Derecho: Links y Redes Sociales --- */
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.footer-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-nav a {
+  color: var(--footer-text-color);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out, text-decoration 0.2s ease-in-out;
+}
+
+.footer-nav a:hover {
+  color: var(--footer-link-color);
+  text-decoration: underline;
+}
+
+.footer-nav a.underlined-link {
+  text-decoration: underline;
+}
+
+.copyright {
+  margin: 0;
+  color: var(--footer-text-color);
+}
+
+.social-icons {
+  display: flex;
+  gap: 20px;
+}
+
+.social-icons a {
+  color: var(--footer-text-color);
+  transition: color 0.2s ease-in-out;
+}
+
+.social-icons a:hover {
+  color: var(--footer-link-color);
+}
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-<header class="header">
-    <div class="container">
-        <div class="header-top" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <!-- Hero Section -->
+        <section class="hero">
             <div class="logo"><a href="/"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200px" viewBox="0 0 500 127" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
 <g><path style="opacity:1" fill="#fc68c8" d="M 450.5,5.5 C 459.347,4.87387 468.014,5.70721 476.5,8C 481.979,10.4306 485.479,14.5973 487,20.5C 492.975,43.5358 494.642,66.8692 492,90.5C 490.881,95.2391 488.381,99.0724 484.5,102C 468.616,110.557 451.616,115.557 433.5,117C 397.938,121.035 362.272,122.368 326.5,121C 315.802,119.961 309.135,114.295 306.5,104C 303.669,82.5892 302.835,61.0892 304,39.5C 304.963,27.2079 311.463,20.0412 323.5,18C 330.473,16.8134 337.473,15.8134 344.5,15C 380.025,12.251 415.358,9.08434 450.5,5.5 Z"/></g>
 <g><path style="opacity:1" fill="#140a10" d="M 456.5,38.5 C 460.514,38.3345 464.514,38.5012 468.5,39C 469.337,40.0113 469.67,41.1779 469.5,42.5C 466.833,42.5 464.167,42.5 461.5,42.5C 462.631,53.1444 463.631,63.8111 464.5,74.5C 463.167,74.5 461.833,74.5 460.5,74.5C 459.167,64.505 457.834,54.505 456.5,44.5C 453.934,44.3444 451.434,44.6777 449,45.5C 446.035,44.2784 445.868,42.7784 448.5,41C 451.457,40.7206 454.123,39.8873 456.5,38.5 Z"/></g>
@@ -467,35 +757,23 @@
 </svg>
 </a>
 </div>
-            <div class="header-actions" style="display: flex; gap: 12px;">
-                <a href="/login.html" class="button-outline">Iniciar sesión</a>
-                <a href="/signup.html" class="button-solid">Crear cuenta</a>
-            </div>
-        </div>
-    </div>
-</header>
-
-
-        <!-- Hero Section -->
-        <section class="hero">
             <h1 class="hero-title">Monetize Your Content</h1>
             <p class="hero-description">
                 Create exclusive video content for your GitHub Sponsors with professional streaming and automatic access control.
             </p>
-            <a href="#demo" class="cta-button">
-                <span>See Demo</span>
-                <span>↓</span>
-            </a>
+            <div class="header-actions" style="display: flex; gap: 12px;">
+                <a href="/login.html" class="button-outline">Iniciar sesión</a>
+                <a href="/signup.html" class="button-solid">Crear cuenta</a>
+            </div>
         </section>
 
         <!-- Features -->
 <section class="features">
-    <h2 class="section-title">Why Sponsorcast?</h2>
-    <p class="section-subtitle">The easiest way to deliver private, high-quality video to your GitHub Sponsors — no friction, just code.</p>
+    <h2 class="section-title">Why Sponsorcast? <span class="section-subtitle">The easiest way to deliver private, high-quality video to your GitHub Sponsors — no friction, just code.</span></h2>
 
     <div class="features-grid">
         <div class="feature-card">
-            <div class="feature-icon">🔐</div>
+            <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M6 9V7.25C6 3.845 8.503 1 12 1s6 2.845 6 6.25V9h.5a2.5 2.5 0 0 1 2.5 2.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 19.5v-8A2.5 2.5 0 0 1 5.5 9Zm-1.5 2.5v8a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-13a1 1 0 0 0-1 1Zm3-4.25V9h9V7.25c0-2.67-1.922-4.75-4.5-4.75-2.578 0-4.5 2.08-4.5 4.75Z"></path></svg></div>
             <h3 class="feature-title">Verified Sponsor Access</h3>
             <p class="feature-description">
                 No passwords. No emails. Sponsorcast uses GitHub’s GraphQL API to authenticate your sponsors securely and instantly.
@@ -503,7 +781,7 @@
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🎞️</div>
+            <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M0 4.75C0 3.784.784 3 1.75 3h20.5c.966 0 1.75.784 1.75 1.75v14.5A1.75 1.75 0 0 1 22.25 21H1.75A1.75 1.75 0 0 1 0 19.25Zm1.75-.25a.25.25 0 0 0-.25.25v14.5c0 .138.112.25.25.25h20.5a.25.25 0 0 0 .25-.25V4.75a.25.25 0 0 0-.25-.25Z"></path><path d="M9 15.584V8.416a.5.5 0 0 1 .77-.42l5.576 3.583a.5.5 0 0 1 0 .842L9.77 16.005a.5.5 0 0 1-.77-.42Z"></path></svg></div>
             <h3 class="feature-title">High-Performance HLS</h3>
             <p class="feature-description">
                 Adaptive bitrate streaming, powered by HLS.js and modern CDN delivery. Your videos load fast and look sharp everywhere.
@@ -511,7 +789,7 @@
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🧩</div>
+            <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M7 11.5H2.938c-.794 0-1.438.644-1.438 1.437v8.313a.75.75 0 0 1-1.5 0v-8.312A2.939 2.939 0 0 1 2.937 10H7V6.151c0-.897.678-1.648 1.57-1.74l6.055-.626 1.006-1.174A1.752 1.752 0 0 1 16.96 2h1.29c.966 0 1.75.784 1.75 1.75V6h3.25a.75.75 0 0 1 0 1.5H20V14h3.25a.75.75 0 0 1 0 1.5H20v2.25a1.75 1.75 0 0 1-1.75 1.75h-1.29a1.75 1.75 0 0 1-1.329-.611l-1.006-1.174-6.055-.627A1.749 1.749 0 0 1 7 15.348Zm9.77-7.913v.001l-1.201 1.4a.75.75 0 0 1-.492.258l-6.353.657a.25.25 0 0 0-.224.249v9.196a.25.25 0 0 0 .224.249l6.353.657c.191.02.368.112.493.258l1.2 1.401a.252.252 0 0 0 .19.087h1.29a.25.25 0 0 0 .25-.25v-14a.25.25 0 0 0-.25-.25h-1.29a.252.252 0 0 0-.19.087Z"></path></svg></div>
             <h3 class="feature-title">Drop-In Web Component</h3>
             <p class="feature-description">
                 One line of code. One tag. That’s all it takes to embed protected videos — no frameworks or build tools required.
@@ -519,7 +797,7 @@
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">📱</div>
+            <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M10.25 5.25A.75.75 0 0 1 11 4.5h2A.75.75 0 0 1 13 6h-2a.75.75 0 0 1-.75-.75ZM12 19.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"></path><path d="M4 2.75C4 1.784 4.784 1 5.75 1h12.5c.966 0 1.75.784 1.75 1.75v18.5A1.75 1.75 0 0 1 18.25 23H5.75A1.75 1.75 0 0 1 4 21.25Zm1.75-.25a.25.25 0 0 0-.25.25v18.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25Z"></path></svg></div>
             <h3 class="feature-title">Made for All Devices</h3>
             <p class="feature-description">
                 Fully responsive and mobile-friendly. Your screencasts look perfect on desktop, tablet, and phone — always.
@@ -527,7 +805,7 @@
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🚀</div>
+            <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M20.322.75h1.176a1.75 1.75 0 0 1 1.75 1.749v1.177a10.75 10.75 0 0 1-2.925 7.374l-1.228 1.304a23.699 23.699 0 0 1-1.596 1.542v5.038c0 .615-.323 1.184-.85 1.5l-4.514 2.709a.75.75 0 0 1-1.12-.488l-.963-4.572a1.305 1.305 0 0 1-.14-.129L8.04 15.96l-1.994-1.873a1.305 1.305 0 0 1-.129-.14l-4.571-.963a.75.75 0 0 1-.49-1.12l2.71-4.514c.316-.527.885-.85 1.5-.85h5.037a23.668 23.668 0 0 1 1.542-1.594l1.304-1.23A10.753 10.753 0 0 1 20.321.75Zm-6.344 4.018v-.001l-1.304 1.23a22.275 22.275 0 0 0-3.255 3.851l-2.193 3.29 1.859 1.744a.545.545 0 0 1 .034.034l1.743 1.858 3.288-2.192a22.263 22.263 0 0 0 3.854-3.257l1.228-1.303a9.251 9.251 0 0 0 2.517-6.346V2.5a.25.25 0 0 0-.25-.25h-1.177a9.252 9.252 0 0 0-6.344 2.518ZM6.5 21c-1.209 1.209-3.901 1.445-4.743 1.49a.236.236 0 0 1-.18-.067.236.236 0 0 1-.067-.18c.045-.842.281-3.534 1.49-4.743.9-.9 2.6-.9 3.5 0 .9.9.9 2.6 0 3.5Zm-.592-8.588L8.17 9.017c.23-.346.47-.685.717-1.017H5.066a.25.25 0 0 0-.214.121l-2.167 3.612ZM16 15.112c-.333.248-.672.487-1.018.718l-3.393 2.262.678 3.223 3.612-2.167a.25.25 0 0 0 .121-.214ZM17.5 8a1.5 1.5 0 1 1-3.001-.001A1.5 1.5 0 0 1 17.5 8Z"></path></svg></div>
             <h3 class="feature-title">Optimized for Dev Workflows</h3>
             <p class="feature-description">
                 CLI-ready, GitHub-friendly, and Vercel-native. Sponsorcast fits into your open source flow with zero friction.
@@ -535,7 +813,7 @@
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🛡️</div>
+            <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"><path d="M11.46 1.137a1.748 1.748 0 0 1 1.08 0l8.25 2.675A1.75 1.75 0 0 1 22 5.476V10.5c0 6.19-3.77 10.705-9.401 12.83a1.704 1.704 0 0 1-1.198 0C5.771 21.204 2 16.69 2 10.5V5.476c0-.76.49-1.43 1.21-1.664Zm.617 1.426a.253.253 0 0 0-.154 0L3.673 5.24a.25.25 0 0 0-.173.237V10.5c0 5.461 3.28 9.483 8.43 11.426a.199.199 0 0 0 .14 0c5.15-1.943 8.43-5.965 8.43-11.426V5.476a.25.25 0 0 0-.173-.237ZM13 12.232V15a1 1 0 0 1-2 0v-2.768a2 2 0 1 1 2 0Z"></path></svg></div>
             <h3 class="feature-title">Privacy-First by Design</h3>
             <p class="feature-description">
                 No tracking. No cookies. No personal data. Built to respect your users and your values — powered by EthicalMetrics (soon).
@@ -544,6 +822,149 @@
     </div>
 </section>
 
+<section class="maintainers-section">
+  <div class="text-content">
+    <h2>Para mantenedores de código abierto</h2>
+    <p>
+      Haz que tu trabajo hable por ti. Sponsorcast te permite recompensar a quienes te apoyan compartiendo contenido exclusivo directamente en tu sitio web o documentación.
+    </p>
+  </div>
+
+  <div class="image-grid-container">
+    <div class="background-glow"></div>
+
+    <div class="sponsor-card card-1">
+      <img src="https://i.imgur.com/DoW2b7L.png" alt="ESLint" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-2">
+      <img src="https://i.imgur.com/E5d1L5G.png" alt="Homebrew" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-3">
+      <img src="https://i.imgur.com/kS5A7ue.png" alt="Henry Zhu" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-4">
+      <img src="https://i.imgur.com/wP0aYp8.png" alt="Nixma" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-5">
+      <img src="https://i.imgur.com/Dcm2gZX.png" alt="Directus" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-6">
+      <img src="https://i.imgur.com/sMhJ8kF.png" alt="ChaynHQ" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-7">
+      <img src="https://i.imgur.com/M6Lg2hU.png" alt="sindresorhus" />
+      <button>♡ Sponsor</button>
+    </div>
+  </div>
+</section>
+
+<section class="maintainers-section">
+    <div class="image-grid-container">
+    <div class="background-glow"></div>
+
+    <div class="sponsor-card card-1">
+      <img src="https://i.imgur.com/DoW2b7L.png" alt="ESLint" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-2">
+      <img src="https://i.imgur.com/E5d1L5G.png" alt="Homebrew" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-3">
+      <img src="https://i.imgur.com/kS5A7ue.png" alt="Henry Zhu" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-4">
+      <img src="https://i.imgur.com/wP0aYp8.png" alt="Nixma" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-5">
+      <img src="https://i.imgur.com/Dcm2gZX.png" alt="Directus" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-6">
+      <img src="https://i.imgur.com/sMhJ8kF.png" alt="ChaynHQ" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-7">
+      <img src="https://i.imgur.com/M6Lg2hU.png" alt="sindresorhus" />
+      <button>♡ Sponsor</button>
+    </div>
+  </div>
+
+  <div class="text-content">
+    <h2>Empieza en minutos</h2>
+    <p>
+      Crea tu espacio de streaming privado con apenas unas líneas de código. Muestra screencasts, tutoriales o avances de nuevas versiones solo a quienes te patrocinan, sin complicaciones técnicas.
+    </p>
+  </div>
+</section>
+
+<section class="maintainers-section">
+  <div class="text-content">
+    <h2>Potencia tus oportunidades de financiamiento</h2>
+    <p>
+      Activa botones de patrocinio visibles en tus repositorios y destaca contenido premium para quienes valoran tu trabajo. Conecta tu perfil con patrocinadores globales interesados en apoyar los OSS o paquetes que usan a diario.
+    </p>
+  </div>
+
+  <div class="image-grid-container">
+    <div class="background-glow"></div>
+
+    <div class="sponsor-card card-1">
+      <img src="https://i.imgur.com/DoW2b7L.png" alt="ESLint" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-2">
+      <img src="https://i.imgur.com/E5d1L5G.png" alt="Homebrew" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-3">
+      <img src="https://i.imgur.com/kS5A7ue.png" alt="Henry Zhu" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-4">
+      <img src="https://i.imgur.com/wP0aYp8.png" alt="Nixma" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-5">
+      <img src="https://i.imgur.com/Dcm2gZX.png" alt="Directus" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-6">
+      <img src="https://i.imgur.com/sMhJ8kF.png" alt="ChaynHQ" />
+      <button>♡ Sponsor</button>
+    </div>
+
+    <div class="sponsor-card card-7">
+      <img src="https://i.imgur.com/M6Lg2hU.png" alt="sindresorhus" />
+      <button>♡ Sponsor</button>
+    </div>
+  </div>
+</section>
 
         <!-- Quick Start -->
         <section class="code-section">
@@ -672,9 +1093,72 @@ sponsorcast upload --video ./my-video.mp4 --name "My GitHub Tutorial" --thumbnai
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p>Built for creators who value their community</p>
-    </footer>
+    <footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-left">
+      <p class="signup-title">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V6.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 6.383v4.722Z"
+          />
+        </svg>
+        Sign up for deals and new collections.
+      </p>
+      <form class="signup-form">
+        <input type="email" placeholder="ENTER EMAIL ADDRESS" />
+        <button type="submit">
+          SUBMIT
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"
+            />
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="footer-right">
+      <nav class="footer-nav">
+        <a href="#">TERMS</a>
+        <a href="#">PRIVACY</a>
+      </nav>
+      <p class="copyright">© 2025 SPONSORCAST PROJECT.</p>
+      <div class="social-icons">
+        <a href="#" aria-label="LinkedIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.703.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.942a3.916 3.916 0 0 0-.923-1.417A3.916 3.916 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.282.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.843-.038 1.096-.047 3.232-.047M8 4.908a3.092 3.092 0 1 0 0 6.184 3.092 3.092 0 0 0 0-6.184zm0 5.083a1.992 1.992 0 1 1 0-3.984 1.992 1.992 0 0 1 0 3.984zm4.572-5.182a.837.837 0 1 0-1.674 0 .837.837 0 0 0 1.674 0z"/></svg>
+        </a>
+        <a href="#" aria-label="YouTube">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.022.26-.01.104c-.048.519-.119 1.023-.22 1.402a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.022-.26.01-.104c.048-.519.119-1.023.22-1.402A2.007 2.007 0 0 1 2.344.336c.65.178 2.16.273 2.95.293l.17.007.17.006.087.004.17.007.172.006c.58.023 1.445.035 2.22.035m6.255 6.293c.003-.599-.001-1.192-.01-1.782-.014-1.021-.11-1.81-.23-2.193a.63.63 0 0 0-.45-.45c-.27-.08-.9-.14-1.73-.162l-.25-.005c-1.13-.02-3.1-.02-3.1 0l-.25.005c-.83.022-1.46.082-1.73.162a.63.63 0 0 0-.45.45c-.12.383-.216 1.172-.23 2.193-.01.59-.014 1.183-.01 1.782v.01c.001.599.005 1.192.01 1.782.014 1.021.11 1.81.23 2.193a.63.63 0 0 0 .45.45c.27.08.9.14 1.73.162l.25.005c1.13.02 3.1.02 3.1 0l.25-.005c.83-.022 1.46-.082 1.73-.162a.63.63 0 0 0 .45-.45c.12-.383.216-1.172.23-2.193.009-.59.013-1.183.01-1.782v-.01zM6.55 5.593v4.22l3.41-2.11z"/></svg>
+        </a>
+        <a href="#" aria-label="X">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
+        </a>
+        <a href="#" aria-label="TikTok">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3V0Z"/></svg>
+        </a>
+        <a href="#" aria-label="GitHub">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
