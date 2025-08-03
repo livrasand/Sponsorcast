@@ -38,18 +38,34 @@ class SponsorCast extends HTMLElement {
         const baseURL = this.getBaseURL();
 
         try {
-            // 1. Revisa si vienes del callback de GitHub con un token nuevo
+            // 1. Verificar si hay parámetros de callback en la URL
             const urlParams = new URLSearchParams(window.location.search);
             const sponsorStatus = urlParams.get('sponsor_status');
             const sponsorToken = urlParams.get('sponsor_token');
             const visitorLogin = urlParams.get('visitor_login');
+            const error = urlParams.get('error');
 
+            // Manejar callback de error
+            if (error) {
+                const errorMessage = urlParams.get('error_message') || 'Authentication failed';
+                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'error_message']);
+                
+                if (error === 'not_sponsor') {
+                    this.showSponsorRequired(container, baseURL, githubUser);
+                } else {
+                    this.showError(`Authentication error: ${errorMessage}`);
+                }
+                return;
+            }
+
+            // Manejar callback exitoso
             if (sponsorStatus === 'true' && sponsorToken) {
-                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
+                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'error_message']);
+                
+                // Guardar token con expiración (55 minutos)
                 localStorage.setItem(`sponsor_token_${githubUser}`, sponsorToken);
-                localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000)); // 55 min
+                localStorage.setItem(`sponsor_token_${githubUser}_expires`, Date.now() + (55 * 60 * 1000));
 
-                // Guardar también el visitor_login si está presente
                 if (visitorLogin) {
                     localStorage.setItem(`visitor_login_${githubUser}`, visitorLogin);
                 }
@@ -58,51 +74,58 @@ class SponsorCast extends HTMLElement {
                 return;
             }
 
-            // 2. Revisa si existe un token guardado en localStorage y si es válido
+            // 2. Verificar token guardado en localStorage
             const storedToken = localStorage.getItem(`sponsor_token_${githubUser}`);
             const tokenExpires = localStorage.getItem(`sponsor_token_${githubUser}_expires`);
 
             if (storedToken && tokenExpires && Date.now() < parseInt(tokenExpires)) {
-                const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
-                    headers: {
-                        'Authorization': `Bearer ${storedToken}`
-                    }
-                });
+                try {
+                    const authRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`, {
+                        headers: {
+                            'Authorization': `Bearer ${storedToken}`
+                        }
+                    });
 
-                if (authRes.ok) {
-                    await this.showVideo(container, baseURL, src, autoplay, width, height);
-                    return; // ¡Éxito con el token!
-                } else {
-                    // El token es inválido o expiró, lo limpiamos
-                    localStorage.removeItem(`sponsor_token_${githubUser}`);
-                    localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
-                    localStorage.removeItem(`visitor_login_${githubUser}`);
+                    if (authRes.ok) {
+                        await this.showVideo(container, baseURL, src, autoplay, width, height);
+                        return;
+                    } else {
+                        // Token inválido, limpiar
+                        this.clearStoredAuth(githubUser);
+                    }
+                } catch (fetchError) {
+                    console.warn('Error validating stored token:', fetchError);
+                    this.clearStoredAuth(githubUser);
                 }
             }
 
-            // 3. ✨ LÓGICA ANTIGUA COMO RESPALDO ✨
-            // Si no hay token o el token fue inválido, intenta el método antiguo (basado en cookies/sesión)
-            const legacyAuthRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`);
-            if (legacyAuthRes.ok) {
-                await this.showVideo(container, baseURL, src, autoplay, width, height);
-                return; // ¡Éxito con el método antiguo!
+            // 3. Método legacy: verificar cookie (backward compatibility)
+            try {
+                const legacyAuthRes = await fetch(`${baseURL}/api/authorize?github-user=${encodeURIComponent(githubUser)}`);
+                if (legacyAuthRes.ok) {
+                    await this.showVideo(container, baseURL, src, autoplay, width, height);
+                    return;
+                }
+            } catch (legacyError) {
+                console.warn('Legacy auth method failed:', legacyError);
             }
 
-            // 4. Si nada de lo anterior funcionó, el usuario no está autorizado.
+            // 4. Usuario no autorizado - mostrar botón de login
             this.showSponsorRequired(container, baseURL, githubUser);
 
         } catch (err) {
-            // Manejo de errores de red generales
-            const errorParam = new URLSearchParams(window.location.search).get('error');
-            if (errorParam) {
-                const errorMessage = new URLSearchParams(window.location.search).get('message') || 'Authentication failed';
-                this.showError(`Authentication error: ${errorMessage}`);
-                this.cleanUrlParams(['sponsor_status', 'sponsor_token', 'github_user', 'visitor_login', 'error', 'message']);
-            } else {
-                this.showError(`Network error: ${err.message}`);
-            }
+            console.error('SponsorCast error:', err);
+            this.showError(`Network error: ${err.message}`);
         }
     }
+
+    // Nuevo método para limpiar autenticación almacenada
+    clearStoredAuth(githubUser) {
+        localStorage.removeItem(`sponsor_token_${githubUser}`);
+        localStorage.removeItem(`sponsor_token_${githubUser}_expires`);
+        localStorage.removeItem(`visitor_login_${githubUser}`);
+    }
+
 
     cleanUrlParams(paramsToRemove) {
         const url = new URL(window.location.href);

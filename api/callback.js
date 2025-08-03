@@ -107,7 +107,7 @@ export default async function handler(req, res) {
     console.log(`Access granted: ${visitorInfo.login} → @${githubUser}`);
 
     // 6. Redirigir de vuelta al sitio original con éxito
-    return redirectWithSuccess(redirectUri, sessionToken, {
+    return redirectWithSuccess(res, redirectUri, sessionToken, {
       githubUser,
       visitorLogin: visitorInfo.login,
       clientState
@@ -138,7 +138,7 @@ export default async function handler(req, res) {
 /**
  * Redirige al sitio original con parámetros de éxito
  */
-function redirectWithSuccess(redirectUri, sessionToken, data) {
+function redirectWithSuccess(res, redirectUri, sessionToken, data) {
   try {
     const url = new URL(redirectUri);
     url.searchParams.set('sponsor_status', 'true');
