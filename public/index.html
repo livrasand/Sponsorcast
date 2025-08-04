@@ -732,6 +732,91 @@
 .social-icons a:hover {
   color: var(--footer-link-color);
 }
+
+.responsive-svg {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 32px;
+    padding: 0 20px;
+  }
+
+  .footer-left,
+  .footer-right {
+    flex-basis: 100%;
+    text-align: center;
+    align-items: center;
+  }
+
+  .footer-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .signup-title {
+    justify-content: center;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  .signup-form {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .signup-form input,
+  .signup-form button {
+    width: 100%;
+    min-width: unset;
+    border-radius: 6px;
+  }
+
+  .signup-form button {
+    border-left: 1px solid var(--footer-border-color);
+  }
+
+  .footer-right {
+    align-items: center;
+  }
+
+  .footer-nav {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-footer {
+    padding: 32px 0;
+    font-size: 11px;
+  }
+
+  .signup-title svg,
+  .signup-form button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .social-icons a svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
     </style>
 </head>
 <body>
@@ -824,147 +909,46 @@
 
 <section class="maintainers-section">
   <div class="text-content">
-    <h2>Para mantenedores de código abierto</h2>
+    <h2>Convierte tu comunidad en apoyo real</h2>
     <p>
-      Haz que tu trabajo hable por ti. Sponsorcast te permite recompensar a quienes te apoyan compartiendo contenido exclusivo directamente en tu sitio web o documentación.
+      ¿Mantienes un proyecto open source? Ahora puedes ofrecer contenido exclusivo —como screencasts, tutoriales o previews— directamente en tu sitio o documentación, recompensando a quienes te apoyan.
     </p>
   </div>
 
   <div class="image-grid-container">
     <div class="background-glow"></div>
-
-    <div class="sponsor-card card-1">
-      <img src="https://i.imgur.com/DoW2b7L.png" alt="ESLint" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-2">
-      <img src="https://i.imgur.com/E5d1L5G.png" alt="Homebrew" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-3">
-      <img src="https://i.imgur.com/kS5A7ue.png" alt="Henry Zhu" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-4">
-      <img src="https://i.imgur.com/wP0aYp8.png" alt="Nixma" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-5">
-      <img src="https://i.imgur.com/Dcm2gZX.png" alt="Directus" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-6">
-      <img src="https://i.imgur.com/sMhJ8kF.png" alt="ChaynHQ" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-7">
-      <img src="https://i.imgur.com/M6Lg2hU.png" alt="sindresorhus" />
-      <button>♡ Sponsor</button>
-    </div>
+    <img src="images/undraw_success_288d.svg" class="responsive-svg">
   </div>
 </section>
 
 <section class="maintainers-section">
-    <div class="image-grid-container">
+  <div class="image-grid-container">
     <div class="background-glow"></div>
-
-    <div class="sponsor-card card-1">
-      <img src="https://i.imgur.com/DoW2b7L.png" alt="ESLint" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-2">
-      <img src="https://i.imgur.com/E5d1L5G.png" alt="Homebrew" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-3">
-      <img src="https://i.imgur.com/kS5A7ue.png" alt="Henry Zhu" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-4">
-      <img src="https://i.imgur.com/wP0aYp8.png" alt="Nixma" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-5">
-      <img src="https://i.imgur.com/Dcm2gZX.png" alt="Directus" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-6">
-      <img src="https://i.imgur.com/sMhJ8kF.png" alt="ChaynHQ" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-7">
-      <img src="https://i.imgur.com/M6Lg2hU.png" alt="sindresorhus" />
-      <button>♡ Sponsor</button>
-    </div>
+    <img src="images/undraw_proud-coder_9prj.svg" class="responsive-svg">
   </div>
 
   <div class="text-content">
-    <h2>Empieza en minutos</h2>
+    <h2>Lanza tu espacio privado en minutos</h2>
     <p>
-      Crea tu espacio de streaming privado con apenas unas líneas de código. Muestra screencasts, tutoriales o avances de nuevas versiones solo a quienes te patrocinan, sin complicaciones técnicas.
+      Integra Sponsorcast en tu proyecto con unas pocas líneas de código. Comparte videos privados directamente en tu sitio —sin contraseñas, sin correos electrónicos, solo acceso automático para patrocinadores verificados de GitHub Sponsors.
     </p>
   </div>
 </section>
 
 <section class="maintainers-section">
   <div class="text-content">
-    <h2>Potencia tus oportunidades de financiamiento</h2>
+    <h2>Convierte estrellas en apoyo real</h2>
     <p>
-      Activa botones de patrocinio visibles en tus repositorios y destaca contenido premium para quienes valoran tu trabajo. Conecta tu perfil con patrocinadores globales interesados en apoyar los OSS o paquetes que usan a diario.
+      Agrega botones de patrocinio visibles, activa el acceso exclusivo y destaca el valor de tu trabajo. Atrae a empresas y usuarios que ya dependen de tus paquetes y quieren devolverte algo a cambio. Más visibilidad, más soporte, más sostenibilidad.
     </p>
   </div>
 
   <div class="image-grid-container">
     <div class="background-glow"></div>
-
-    <div class="sponsor-card card-1">
-      <img src="https://i.imgur.com/DoW2b7L.png" alt="ESLint" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-2">
-      <img src="https://i.imgur.com/E5d1L5G.png" alt="Homebrew" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-3">
-      <img src="https://i.imgur.com/kS5A7ue.png" alt="Henry Zhu" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-4">
-      <img src="https://i.imgur.com/wP0aYp8.png" alt="Nixma" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-5">
-      <img src="https://i.imgur.com/Dcm2gZX.png" alt="Directus" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-6">
-      <img src="https://i.imgur.com/sMhJ8kF.png" alt="ChaynHQ" />
-      <button>♡ Sponsor</button>
-    </div>
-
-    <div class="sponsor-card card-7">
-      <img src="https://i.imgur.com/M6Lg2hU.png" alt="sindresorhus" />
-      <button>♡ Sponsor</button>
-    </div>
+    <img src="images/undraw_launching_szjw.svg" class="responsive-svg">
   </div>
 </section>
+
 
         <!-- Quick Start -->
         <section class="code-section">
@@ -1110,8 +1094,11 @@ sponsorcast upload --video ./my-video.mp4 --name "My GitHub Tutorial" --thumbnai
         </svg>
         Sign up for deals and new collections.
       </p>
-      <form class="signup-form">
-        <input type="email" placeholder="ENTER EMAIL ADDRESS" />
+      <form class="signup-form"
+  action="https://formspree.io/f/xzzvjzre"
+  method="POST"
+>
+        <input type="email" name="email" placeholder="ENTER EMAIL ADDRESS" />
         <button type="submit">
           SUBMIT
           <svg
@@ -1137,22 +1124,7 @@ sponsorcast upload --video ./my-video.mp4 --name "My GitHub Tutorial" --thumbnai
       </nav>
       <p class="copyright">© 2025 SPONSORCAST PROJECT.</p>
       <div class="social-icons">
-        <a href="#" aria-label="LinkedIn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/></svg>
-        </a>
-        <a href="#" aria-label="Instagram">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.703.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.942a3.916 3.916 0 0 0-.923-1.417A3.916 3.916 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.282.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.843-.038 1.096-.047 3.232-.047M8 4.908a3.092 3.092 0 1 0 0 6.184 3.092 3.092 0 0 0 0-6.184zm0 5.083a1.992 1.992 0 1 1 0-3.984 1.992 1.992 0 0 1 0 3.984zm4.572-5.182a.837.837 0 1 0-1.674 0 .837.837 0 0 0 1.674 0z"/></svg>
-        </a>
-        <a href="#" aria-label="YouTube">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.022.26-.01.104c-.048.519-.119 1.023-.22 1.402a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.022-.26.01-.104c.048-.519.119-1.023.22-1.402A2.007 2.007 0 0 1 2.344.336c.65.178 2.16.273 2.95.293l.17.007.17.006.087.004.17.007.172.006c.58.023 1.445.035 2.22.035m6.255 6.293c.003-.599-.001-1.192-.01-1.782-.014-1.021-.11-1.81-.23-2.193a.63.63 0 0 0-.45-.45c-.27-.08-.9-.14-1.73-.162l-.25-.005c-1.13-.02-3.1-.02-3.1 0l-.25.005c-.83.022-1.46.082-1.73.162a.63.63 0 0 0-.45.45c-.12.383-.216 1.172-.23 2.193-.01.59-.014 1.183-.01 1.782v.01c.001.599.005 1.192.01 1.782.014 1.021.11 1.81.23 2.193a.63.63 0 0 0 .45.45c.27.08.9.14 1.73.162l.25.005c1.13.02 3.1.02 3.1 0l.25-.005c.83-.022 1.46-.082 1.73-.162a.63.63 0 0 0 .45-.45c.12-.383.216-1.172.23-2.193.009-.59.013-1.183.01-1.782v-.01zM6.55 5.593v4.22l3.41-2.11z"/></svg>
-        </a>
-        <a href="#" aria-label="X">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
-        </a>
-        <a href="#" aria-label="TikTok">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3V0Z"/></svg>
-        </a>
-        <a href="#" aria-label="GitHub">
+        <a href="https://github.com/livrasand/Sponsorcast" aria-label="GitHub">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
         </a>
       </div>
