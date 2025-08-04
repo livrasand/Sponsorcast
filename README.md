@@ -63,11 +63,8 @@
 # Install CLI
 npm install -g sponsorcast-cli
 
-# Convert video to HLS
-sponsorcast convert input.mp4 --output my-video-id
-
 # Upload to your instance
-sponsorcast upload my-video-id --endpoint https://your-domain.com
+sponsorcast upload --video ./my-video.mp4
 ```
 
 ## Security Features
